@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        xmlns:android="http://schemas.android.com/apk/res/android">
+
+
+    <TextView
+            android:layout_width="114dp"
+            android:layout_height="wrap_content"
+            android:text="@string/newevent_name"
+            android:id="@+id/textView"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"/>
+
+    <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/newevent_date"
+            android:id="@+id/textView1"
+            android:layout_alignLeft="@+id/textView"
+            android:layout_below="@+id/textView"
+            android:layout_alignRight="@+id/textView"/>
+
+    <EditText
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="New EditText"
+            android:id="@+id/txtEventName"
+            android:layout_toRightOf="@+id/textView"
+            android:layout_alignTop="@+id/textView"
+            android:layout_alignBottom="@+id/textView"
+            android:layout_alignParentRight="true"/>
+
+    <EditText
+            android:layout_width="wrap_content"
+            android:layout_height="47dp"
+            android:text="New EditText"
+            android:id="@+id/txtEventDate"
+            android:layout_toRightOf="@+id/textView"
+            android:layout_below="@+id/textView"
+            android:layout_alignBottom="@+id/textView1"
+            android:layout_alignRight="@+id/txtEventName"/>
+
+    <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Crear"
+            android:id="@+id/btn_newevent"
+            android:layout_alignParentLeft="true"
+            android:layout_marginLeft="65dp"
+            android:layout_below="@+id/textView1"/>
+
+    <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Cancelar"
+            android:id="@+id/btn_cancelevent"
+            android:layout_toRightOf="@+id/btn_newevent"
+            android:layout_below="@+id/textView1"
+            android:singleLine="false"/>
+
+</RelativeLayout>

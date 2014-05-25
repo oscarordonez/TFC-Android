@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+<string name="txt_user">Usuario</string>
+    <string name="txt_pass">Contraseña</string>
+    <string name="txt_NewUser">Nuevo usuario</string>
+    <string name="first_name">Nombre</string>
+    <string name="email_address">Correo</string>
+    <string name="password">Contrassenya</string>
+    <string name="password_confirm">Conf. contrassenya</string>
+    <string name="Ok2_button">OK</string>
+    <string name="cancel">Cancelar</string>
+    <item name="textView_pass" type="id">Contraseña</item>
+</resources>

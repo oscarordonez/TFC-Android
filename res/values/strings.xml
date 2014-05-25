@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Patxangueitor</string>
+    <string name="action_settings">Settings</string>
+    <string name="Ok_button">Connectar</string>
+    <string name="Cancel_button">Cancelar</string>
+    <string name="SignUp_button">Nou Usuari</string>
+    <string name="txt_user">Usuari</string>
+    <string name="txt_pass">Contrassenya</string>
+    <string name="title_activity_main">MainActivity</string>
+    <string name="title_section1">Section 1</string>
+    <string name="title_section2">Section 2</string>
+    <string name="title_section3">Section 3</string>
+    <string name="first_name">Nom</string>
+    <string name="email_address">Correu</string>
+    <string name="password">Contrassenya</string>
+    <string name="password_confirm">Conf. contrassenya</string>
+    <string name="Ok2_button">OK</string>
+    <string name="cancel">Cancelar</string>
+    <string name="title_activity_mainscreen">Principal</string>
+    <string name="title_activity_fullscreen">FullscreenActivity</string>
+    <string name="dummy_button">Dummy Button</string>
+    <string name="dummy_content">DUMMY\nCONTENT</string>
+    <string name="title_activity_subs_list_user">Subscripció llista</string>
+    <string name="newlist_name">Nom llista</string>
+    <string name="newlist_date">Data - Hora</string>
+    <string name="APPKEY">iGXpZFRj2XCl9Aixrig80d0rrftOzRef</string><string name="newevent_name">Nom event</string><string name="newevent_Active">Actiu</string><string name="newevent_date">Data</string>
+
+</resources>

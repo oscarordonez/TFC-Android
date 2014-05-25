@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <TextView
+            android:layout_width="120dp"
+            android:layout_height="30dp"
+            android:text="@string/newlist_name"
+            android:id="@+id/tv"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            />
+
+    <TextView
+            android:layout_width="120dp"
+            android:layout_height="30dp"
+            android:text="@string/newlist_date"
+            android:id="@+id/textView1"
+            android:layout_alignLeft="@+id/tv"
+            android:layout_below="@+id/tv"/>
+
+    <EditText
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/txtnewlist_name"
+            android:layout_alignTop="@+id/tv"
+            android:layout_alignBottom="@+id/tv"
+            android:layout_toRightOf="@+id/tv"/>
+
+    <EditText
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/txtnewlist_day"
+            android:layout_alignLeft="@+id/txtnewlist_name"
+            android:layout_below="@+id/tv"
+            android:layout_alignBottom="@+id/textView1"
+            android:layout_alignRight="@+id/txtnewlist_name"
+            android:layout_toRightOf="@+id/tv"/>
+
+    <TextView
+            android:layout_width="120dp"
+            android:layout_height="30dp"
+            android:text="Lloc"
+            android:id="@+id/newlist_place"
+            android:layout_alignLeft="@+id/tv"
+            android:layout_below="@+id/textView1"/>
+
+    <EditText
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/txtnewlist_place"
+            android:layout_below="@+id/textView1"
+            android:layout_alignBottom="@+id/newlist_place"
+            android:layout_toRightOf="@+id/tv"/>
+
+    <Button
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:text="Crear"
+            android:id="@+id/btnnewlist_ok"
+            android:layout_alignParentLeft="true"
+            android:layout_marginLeft="35dp"
+            android:layout_below="@+id/newlist_place"/>
+
+    <Button
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:text="Cancelar"
+            android:id="@+id/btnnewlist_cancel"
+            android:layout_alignParentLeft="true"
+            android:layout_marginLeft="170dp"
+            android:layout_below="@+id/newlist_place"
+            android:layout_alignBottom="@+id/btnnewlist_ok"/>
+
+</RelativeLayout>

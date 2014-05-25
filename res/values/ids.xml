@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+<item name="textView_user" type="id">textView_user</item>
+<item name="textView_password" type="id">textView_password</item>
+<item name="txt_user" type="id">txtUser</item>
+<item name="txt_pass" type="id">txtPass</item>
+<item name="btnCancel" type="id">buttonCancel</item>
+<item name="btnOk" type="id">buttonOk</item>
+<item name="btnNewUser" type="id">button_NewUser</item><item name="textViewAdmin" type="id"/>
+</resources>

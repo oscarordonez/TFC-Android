@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+          xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/grouptextview" android:layout_width="fill_parent"
+          android:layout_height="45dip" android:text="Groups" android:gravity="center_vertical|left"
+          android:paddingLeft="30dip" android:paddingRight="5dip"
+          android:textColor="@android:color/background_dark" android:textStyle="bold"
+          android:textSize="17dip"
+          android:singleLine="false">
+</TextView>

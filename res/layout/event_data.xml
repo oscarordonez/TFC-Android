@@ -1,0 +1,44 @@
+<RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="New Text"
+            android:id="@+id/txt_eventname"
+            style="@android:style/TextAppearance.DeviceDefault.Medium"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"/>
+
+    <TextView
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:text="New Text1"
+            android:id="@+id/txt_eventadate"
+            style="@android:style/TextAppearance.DeviceDefault.Small"
+            android:layout_alignLeft="@+id/txt_eventname"
+            android:layout_below="@+id/txt_eventname"/>
+
+    <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Hora: ..."
+            android:id="@+id/txt_eventHour"
+            style="@android:style/TextAppearance.DeviceDefault.Small"
+            android:layout_toRightOf="@+id/txt_eventadate"
+            android:layout_below="@+id/txt_eventname"
+            android:paddingLeft="20dp"
+            android:layout_alignRight="@+id/txt_eventname"/>
+
+    <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Lloc: ..."
+            android:id="@+id/txt_eventPlace"
+            android:layout_alignLeft="@+id/txt_eventname"
+            android:layout_below="@+id/txt_eventadate"
+            android:layout_alignRight="@+id/txt_eventname"/>
+
+</RelativeLayout>

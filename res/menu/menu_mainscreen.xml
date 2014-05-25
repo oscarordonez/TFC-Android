@@ -1,0 +1,13 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Search, should appear as action button -->
+    <item android:id="@+id/action_logout"
+          android:showAsAction="never"
+          android:orderInCategory="9999"
+          android:title="Sortir"
+            />
+
+        <item android:id="@+id/action_test"
+              android:showAsAction="never"
+              android:orderInCategory="10"
+              android:title="Test" />
+</menu>
