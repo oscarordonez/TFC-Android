@@ -94,12 +94,17 @@ public class mainscreen extends FragmentActivity implements ActionBar.TabListene
     @Override
     public void onTabUnselected(ActionBar.Tab tab, FragmentTransaction ft) {
     }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_logout:
                 LogOutTask tasklogout= new LogOutTask();
                 tasklogout.execute();
+                return true;
+            case R.id.action_notifications:
+                Intent intent_pushN = new Intent(mainscreen.this.getApplicationContext(), act_pushN.class);
+                startActivity(intent_pushN);
                 return true;
         }
         return true;

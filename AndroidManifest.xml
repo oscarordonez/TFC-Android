@@ -8,12 +8,25 @@
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.CHANGE_CONFIGURATION"/>
 
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
+
 
     <application
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
+
+        <meta-data
+                android:name="com.google.android.gms.version"
+                android:value="4452000" />
+
+        <service android:name="com.appcelerator.cloud.push.PushService" />
+
         <activity
             android:name="org.tfc.patxangueitor.signin"
             android:label="@string/app_name"
@@ -73,6 +86,11 @@
                 android:label="Afegir nou usuari"
                 android:configChanges="orientation|keyboardHidden">
         </activity>
+        <activity
+                android:name=".act_pushN"
+                android:label="Push Notifications"
+                android:configChanges="orientation|keyboardHidden">
+         </activity>
 
     </application>
 

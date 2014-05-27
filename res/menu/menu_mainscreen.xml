@@ -6,8 +6,8 @@
           android:title="Sortir"
             />
 
-        <item android:id="@+id/action_test"
+        <item android:id="@+id/action_notifications"
               android:showAsAction="never"
               android:orderInCategory="10"
-              android:title="Test" />
+              android:title="Push Notifications" />
 </menu>
