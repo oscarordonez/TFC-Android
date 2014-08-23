@@ -3,7 +3,6 @@ package org.tfc.patxangueitor;
 
 import android.app.ProgressDialog;
 import android.os.AsyncTask;
-import android.widget.ProgressBar;
 import com.appcelerator.cloud.sdk.*;
 
 import android.app.Activity;
@@ -17,22 +16,22 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-
-
 
 public class signin extends Activity {
     private String user_id;
     protected boolean booResult;
     protected String txtLogin;
     protected String txtPass;
+    protected int mCurrentScore;
+    protected int mCurrentLevel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.signin);
 
         View connectbtn = findViewById(R.id.btnOk);
@@ -43,6 +42,8 @@ public class signin extends Activity {
                 //booResult = false;
                 txtLogin = ((EditText) findViewById(R.id.txt_user)).getText().toString();
                 txtPass = ((EditText) findViewById(R.id.txt_pass)).getText().toString();
+                ((EditText) findViewById(R.id.txt_user)).setText("");
+                ((EditText) findViewById(R.id.txt_pass)).setText("");
                 //final ProgressDialog dialog = ProgressDialog.show(signin.this, "","Connectant...", true);
 
                 SignInTask tasksignin= new SignInTask();

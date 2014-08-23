@@ -1,0 +1,24 @@
+<RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="Text"
+            android:id="@+id/txt_listname"
+            style="@android:style/TextAppearance.DeviceDefault.Medium"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"/>
+
+    <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="SubText"
+            android:id="@+id/txt_listdate"
+            style="@android:style/TextAppearance.DeviceDefault.Small"
+            android:layout_alignLeft="@+id/txt_listname"
+            android:layout_below="@+id/txt_listname"/>
+
+</RelativeLayout>

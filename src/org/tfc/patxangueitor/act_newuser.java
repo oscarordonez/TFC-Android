@@ -19,6 +19,7 @@ import java.util.Map;
 public class act_newuser extends Activity {
     private ListView lv;
     private String llista_id;
+    private String nom_llista;
     private JSONObject auxJSON;
     private int i;
     private JSONArray users;
@@ -33,6 +34,7 @@ public class act_newuser extends Activity {
 
         Bundle b = this.getIntent().getExtras();
         llista_id = b.getString("Llista");
+        nom_llista = b.getString("NomLlista");
 
         LoadAllUsersTask taskloadallusers= new LoadAllUsersTask();
         taskloadallusers.execute();
@@ -219,7 +221,7 @@ public class act_newuser extends Activity {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }
 
-        data.put("fields", "{\"id_llista\" : \"" + llista_id + "\", \"id_user\": \"" + txtuserid + "\", \"username\": \"" + txtusername + "\", \"firstname\": \"" + txtfirstname
+        data.put("fields", "{\"id_llista\" : \"" + llista_id + "\", \"nom_llista\": \"" + nom_llista + "\", \"id_user\": \"" + txtuserid + "\", \"username\": \"" + txtusername + "\", \"firstname\": \"" + txtfirstname
                 + "\", \"email\": \"" + txtemail + "\"}");
 
 

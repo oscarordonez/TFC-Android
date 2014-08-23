@@ -105,6 +105,8 @@ public class act_neweventuser extends Activity {
                     //values.add(i, aux.getString("id_usuari"));
                     //JSONObject userdata = aux.getJSONObject("user");
                     //String StrACS_id, String StrUser, String StrFirstName, String StrEmail
+                    String txtidobj = null;
+                    txtidobj = aux.getString("id");
                     String txtiduser = null;
                     txtiduser = aux.getString("id_user");
                     String txtuser = null;
@@ -114,7 +116,7 @@ public class act_neweventuser extends Activity {
                     String txtemail = null;
                     txtemail = "";
                     //String StrACS_id, String StrUser, String StrFirstName, String StrEmail
-                    User user_aux = new User(txtiduser,txtuser,txtfirstname,txtemail);
+                    User user_aux = new User(txtidobj,txtiduser,txtuser,txtfirstname,txtemail);
                     users.add(user_aux);
                 } catch (JSONException e) {
                     e.printStackTrace();

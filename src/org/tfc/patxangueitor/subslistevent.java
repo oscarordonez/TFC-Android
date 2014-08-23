@@ -1,20 +1,19 @@
 package org.tfc.patxangueitor;
 
-
 import android.app.ActionBar;
 import android.app.FragmentTransaction;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
-import android.view.Menu;
-import org.tfc.adapters.TabsPagerAdapter4;
+import org.tfc.adapters.TabsPagerAdapter5;
 
-public class subslistuser extends FragmentActivity implements ActionBar.TabListener {
+
+public class subslistevent extends FragmentActivity implements ActionBar.TabListener {
     private ViewPager viewPager;
-    private TabsPagerAdapter4 mAdapter;
+    private TabsPagerAdapter5 mAdapter;
     private ActionBar actionBar;
     // Tab titles
-    private String[] tabs = { "Usuaris", "Events" };
+    private String[] tabs = { "Dades", "Usuaris" };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -22,9 +21,10 @@ public class subslistuser extends FragmentActivity implements ActionBar.TabListe
         setContentView(R.layout.activity_mainscreen);
 
         // Initilization
+
         viewPager = (ViewPager) findViewById(R.id.pager);
         actionBar = getActionBar();
-        mAdapter = new TabsPagerAdapter4(getSupportFragmentManager());
+        mAdapter = new TabsPagerAdapter5(getSupportFragmentManager());
         viewPager.setAdapter(mAdapter);
         actionBar.setHomeButtonEnabled(false);
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
@@ -55,12 +55,12 @@ public class subslistuser extends FragmentActivity implements ActionBar.TabListe
         });
     }
 
-    @Override
+ /*   @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu items for use in the action bar
         getMenuInflater().inflate(R.menu.menu_mainscreen, menu);
         return super.onCreateOptionsMenu(menu);
-    }
+    }*/
 
     @Override
     public void onTabReselected(ActionBar.Tab tab, FragmentTransaction ft) {

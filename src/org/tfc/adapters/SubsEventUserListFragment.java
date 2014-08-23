@@ -3,22 +3,20 @@ package org.tfc.adapters;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.AsyncTask;
-import org.tfc.classes.User;
-import org.tfc.patxangueitor.R;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 import com.appcelerator.cloud.sdk.*;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.tfc.patxangueitor.act_newuser;
-
+import org.tfc.classes.User;
+import org.tfc.patxangueitor.R;
+import org.tfc.patxangueitor.act_neweventuser;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -26,18 +24,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class UserListFragment extends Fragment {
+public class SubsEventUserListFragment extends Fragment {
     private ListView lv;
-    private TextView tv_newuser;
     private String llista_id;
-    private String nom_llista;
+    private String event_id;
     private JSONArray llista;
     private UserAdapter adapter;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.adminlist, container, false);
+        return inflater.inflate(R.layout.subslist, container, false);
     }
 
     @Override
@@ -46,33 +43,20 @@ public class UserListFragment extends Fragment {
 
         Bundle bundle = getActivity().getIntent().getExtras();
         llista_id = bundle.getString("Llista");
-        nom_llista = bundle.getString("NomLlista");
+        event_id = bundle.getString("Event");
         llista = new JSONArray();
 
-        tv_newuser = (TextView)getView().findViewById(R.id.id_NewList);
-        tv_newuser.setText("+ Usuari");
-        tv_newuser.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View view) {
-                Intent intent_NewUser = new Intent(getActivity().getApplicationContext(), act_newuser.class);
-                Bundle b = new Bundle();
-                b.putString("Llista", llista_id);
-                b.putString("NomLlista", nom_llista);
-                intent_NewUser.putExtras(b);
-                startActivity(intent_NewUser);
-            }
-        });
-
-        LoadUsersTask taskloadusers= new LoadUsersTask();
-        taskloadusers.execute();
+        LoadEventUsersTask taskloadeventusers= new LoadEventUsersTask();
+        taskloadeventusers.execute();
     }
 
-    private class LoadUsersTask extends AsyncTask<Void, Void, Void>{
+    private class LoadEventUsersTask extends AsyncTask<Void, Void, Void>{
         private ProgressDialog dia;
 
         @Override
         protected void onPreExecute() {
             dia = new ProgressDialog(getActivity());
-            dia.setMessage("Recuperant dades. Esperi...");
+            dia.setMessage("Recuperant usuaris event. Esperi...");
             dia.show();
         }
 
@@ -82,12 +66,12 @@ public class UserListFragment extends Fragment {
             ACSClient sdk = new ACSClient("iGXpZFRj2XCl9Aixrig80d0rrftOzRef",getActivity().getApplicationContext()); // app key
 
             Map<String, Object> data = new HashMap<String, Object>();
-            data.put("where", "{\"id_llista\" : \"" + llista_id + "\"}");
+            data.put("where", "{\"id\" : \"" + event_id + "\"}");
             data.put("order", "id_usuari");
 
             CCResponse response = null;
             try {
-                response = sdk.sendRequest("objects/subscripcio_usuari/query.json", CCRequestMethod.GET, data);
+                response = sdk.sendRequest("objects/subscripcio_event/query.json", CCRequestMethod.GET, data);
             } catch (ACSClientError acsClientError) {
                 acsClientError.printStackTrace();
             } catch (IOException e) {
@@ -100,7 +84,7 @@ public class UserListFragment extends Fragment {
                     && meta.getCode() == 200
                     && "queryCustomObjects".equals(meta.getMethod())) {
                 try {
-                    llista = responseJSON.getJSONArray("subscripcio_usuari");
+                    llista = responseJSON.getJSONArray("subscripcio_usuari_event");
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -151,7 +135,7 @@ public class UserListFragment extends Fragment {
             adapter = new UserAdapter(getActivity(),R.layout.user, users);
             adapter.notifyDataSetChanged();
 
-            lv = (ListView)getView().findViewById(R.id.lvAdmin);
+            lv = (ListView)getView().findViewById(R.id.lvSubs);
             lv.setAdapter(adapter);
         }
     }

@@ -131,9 +131,9 @@ public class mainscreen extends FragmentActivity implements ActionBar.TabListene
                 dia.dismiss();
             }
             if (booResult){
-                toast_logout = Toast.makeText(getApplicationContext(),
-                        "La sessió s'ha desconnectat", Toast.LENGTH_LONG);
-                toast_logout.show();
+                //toast_logout = Toast.makeText(getApplicationContext(),
+                //        "La sessió s'ha desconnectat", Toast.LENGTH_LONG);
+                //toast_logout.show();
                 finish();
             }
             else

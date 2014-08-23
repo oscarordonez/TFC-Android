@@ -8,46 +8,45 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
-import org.tfc.classes.User;
+import org.tfc.classes.Llista;
 import org.tfc.patxangueitor.R;
 
 import java.util.List;
 
-public class UserAdapter extends ArrayAdapter<User> {
+public class LlistaAdapter extends ArrayAdapter<Llista> {
     Context context;
 
-    public UserAdapter(Context context, int resourceId,
-                                 List<User> users) {
-        super(context, resourceId, users);
+    public LlistaAdapter(Context context, int resourceId,
+                         List<Llista> llistes) {
+        super(context, resourceId, llistes);
         this.context = context;
     }
 
     private class ViewHolder {
-        TextView txtUser;
-        TextView txtName;
-        TextView txtACSId;
+        TextView txtNom;
+        TextView txtData;
     }
 
     public View getView(int position, View convertView, ViewGroup parent) {
         ViewHolder holder = null;
-        User user = getItem(position);
+        Llista llista = getItem(position);
 
         LayoutInflater mInflater = (LayoutInflater) context
                 .getSystemService(Activity.LAYOUT_INFLATER_SERVICE);
         if (convertView == null) {
-            convertView = mInflater.inflate(R.layout.user, null);
+            convertView = mInflater.inflate(R.layout.llista, null);
             holder = new ViewHolder();
-            holder.txtUser = (TextView) convertView.findViewById(R.id.txt_username);
-            holder.txtName = (TextView) convertView.findViewById(R.id.txt_firstname);
-            holder.txtACSId = (TextView) convertView.findViewById(R.id.txt_id);
+            holder.txtNom = (TextView) convertView.findViewById(R.id.txt_listname);
+            holder.txtData= (TextView) convertView.findViewById(R.id.txt_listdate);
             convertView.setTag(holder);
         } else
             holder = (ViewHolder) convertView.getTag();
 
-        holder.txtUser.setText(user.getUser());
-        holder.txtName.setText("Nom: " + user.getFirstName());
-        holder.txtACSId.setText("Id usuari: " + user.getACS_id());
+        holder.txtNom.setText(llista.getNom_llista());
+        holder.txtData.setText("Dia: " + llista.getDia_llista());
 
         return convertView;
     }
+
+
 }

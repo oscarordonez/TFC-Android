@@ -8,14 +8,12 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.ListView;
-import android.widget.TextView;
+import android.widget.*;
 import com.appcelerator.cloud.sdk.*;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.tfc.classes.Llista;
 import org.tfc.patxangueitor.R;
 import org.tfc.patxangueitor.act_newlist;
 import org.tfc.patxangueitor.adminlistuser;
@@ -23,6 +21,7 @@ import org.tfc.patxangueitor.adminlistuser;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class AdminListFragment extends Fragment {
@@ -30,10 +29,12 @@ public class AdminListFragment extends Fragment {
     private TextView tv_newlist;
     private String user_id;
     private String llista_id;
+    private String nom_llista;
     private JSONObject auxJSON;
     private int i;
     private JSONArray llista;
-    private ArrayAdapter<String> adapter;
+    private LlistaAdapter adapter;
+    private List<Llista> llistes;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -71,6 +72,7 @@ public class AdminListFragment extends Fragment {
     private class LoadListTask extends AsyncTask<Void, Void, Void>
     {
         private ProgressDialog dia;
+        private ProgressDialog dia1;
 
         @Override
         protected void onPreExecute() {
@@ -116,21 +118,34 @@ public class AdminListFragment extends Fragment {
         @Override
         protected void onPostExecute(Void result)
         {
+
             if (dia.isShowing()) {
                 dia.dismiss();
             }
 
-            ArrayList<String> values = new ArrayList<String>();
+            //ArrayList<String> values = new ArrayList<String>();
+
+            llistes = new ArrayList<Llista>();
+
             for (i = 0; i < llista.length(); i++) {
                 try {
-                    auxJSON = llista.getJSONObject(i);
-                    values.add(i, auxJSON.getString("nom"));
+                    JSONObject aux = llista.getJSONObject(i);
+                    String txtidlist = "";
+                    txtidlist = aux.getString("id");
+                    String txtlistname = "";
+                    txtlistname = aux.getString("nom");
+                    String txtlistdate = "";
+                    txtlistdate = aux.getString("data");
+
+                    Llista llista_aux = new Llista(txtidlist,txtlistname,txtlistdate);
+                    llistes.add(llista_aux);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
             }
 
-            adapter = new ArrayAdapter<String>(getActivity(),android.R.layout.simple_list_item_1, values);
+            //adapter = new ArrayAdapter<String>(getActivity(),android.R.layout.simple_list_item_1, values);
+            adapter = new LlistaAdapter(getActivity(),R.layout.llista,llistes);
             adapter.notifyDataSetChanged();
 
             lv = (ListView)getView().findViewById(R.id.lvAdmin);
@@ -138,16 +153,14 @@ public class AdminListFragment extends Fragment {
             lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 public void onItemClick(AdapterView<?> parent, View v,
                                         int position, long id) {
-                    try {
-                        auxJSON = llista.getJSONObject(position);
-                        llista_id = auxJSON.getString("id");
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
+                    Llista aux = llistes.get(position);
+                    llista_id = aux.getLlista_id();
+                    nom_llista = aux.getNom_llista();
 
                     Intent myIntent = new Intent(getActivity().getApplicationContext(), adminlistuser.class);
                     Bundle b = new Bundle();
                     b.putString("Llista", llista_id);
+                    b.putString("NomLlista", nom_llista);
                     myIntent.putExtras(b);
                     startActivity(myIntent);
                 }

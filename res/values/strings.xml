@@ -24,7 +24,7 @@
     <string name="dummy_content">DUMMY\nCONTENT</string>
     <string name="title_activity_subs_list_user">Subscripció llista</string>
     <string name="newlist_name">Nom llista</string>
-    <string name="newlist_date">Data - Hora</string>
-    <string name="APPKEY">iGXpZFRj2XCl9Aixrig80d0rrftOzRef</string><string name="newevent_name">Nom event</string><string name="newevent_Active">Actiu</string><string name="newevent_date">Data</string>
+    <string name="newlist_date">Data</string>
+    <string name="APPKEY">iGXpZFRj2XCl9Aixrig80d0rrftOzRef</string><string name="newevent_name">Nom event</string><string name="newevent_Active">Actiu</string><string name="newevent_date">Data</string><string name="newlist_time">Hora</string>
 
 </resources>

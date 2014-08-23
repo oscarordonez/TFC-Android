@@ -3,17 +3,23 @@ package org.tfc.adapters;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.AsyncTask;
-import android.view.*;
-import android.widget.*;
+import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ListView;
+import android.widget.TextView;
 import com.appcelerator.cloud.sdk.*;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.tfc.classes.Llista;
+import org.tfc.classes.Event;
 import org.tfc.patxangueitor.R;
-import android.os.Bundle;
-import android.support.v4.app.Fragment;
-import org.tfc.patxangueitor.subslistuser;
+import org.tfc.patxangueitor.act_newevent;
+import org.tfc.patxangueitor.adminlistevent;
+import org.tfc.patxangueitor.subslistevent;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -21,16 +27,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-
-public class SubsListFragment extends Fragment{
+public class EventSubsListFragment extends Fragment {
     private ListView lv;
-    private String user_id;
     private String llista_id;
-    private JSONObject auxJSON;
-    private int i;
+    private String event_id;
     private JSONArray llista;
-    private LlistaAdapter adapter;
-    private List<Llista> llistes;
+    private EventAdapter adapter;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -38,48 +40,41 @@ public class SubsListFragment extends Fragment{
         return inflater.inflate(R.layout.subslist, container, false);
     }
 
-    public void onResume(){
-        super.onResume();
-        LoadListTask taskload= new LoadListTask();
-        taskload.execute();
-    }
-
     @Override
-    public void onActivityCreated(Bundle savedInstanceState)
-    {
+    public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        llista = new JSONArray();
-        Bundle bundle = getActivity().getIntent().getExtras();
-        user_id = bundle.getString("User");
 
-        LoadListTask taskload= new LoadListTask();
-        taskload.execute();
+        Bundle bundle = getActivity().getIntent().getExtras();
+        llista_id = bundle.getString("Llista");
+        llista = new JSONArray();
+
+        LoadEventsTask eventload= new LoadEventsTask();
+        eventload.execute();
     }
 
-    private class LoadListTask extends AsyncTask<Void, Void, Void>
+    private class LoadEventsTask extends AsyncTask<Void, Void, Void>
     {
-        //private ProgressDialog dia;
+        private ProgressDialog dia;
 
-        /*@Override
+        @Override
         protected void onPreExecute() {
             dia = new ProgressDialog(getActivity());
             dia.setMessage("Recuperant dades. Esperi...");
             dia.show();
-        } */
+        }
 
         @Override
         protected Void doInBackground(Void... params)
         {
-            /*-----------RECUPERAR LLISTES-----------------*/
-            // Test ACS
-            ACSClient sdk = new ACSClient("iGXpZFRj2XCl9Aixrig80d0rrftOzRef",getActivity().getApplicationContext()); // app key
+            ACSClient sdk = new ACSClient("iGXpZFRj2XCl9Aixrig80d0rrftOzRef",getActivity().getApplicationContext());
+
             Map<String, Object> data = new HashMap<String, Object>();
-            data.put("where", "{\"id_user\" : \"" + user_id + "\"}");
-            data.put("order", "id_user");
+            data.put("where", "{\"id_llista\" : \"" + llista_id + "\"}");
+            data.put("order", "id_event");
 
             CCResponse response = null;
             try {
-                response = sdk.sendRequest("objects/subscripcio_usuari/query.json", CCRequestMethod.GET, data);
+                response = sdk.sendRequest("objects/event/query.json", CCRequestMethod.GET, data);
             } catch (ACSClientError acsClientError) {
                 acsClientError.printStackTrace();
             } catch (IOException e) {
@@ -92,7 +87,7 @@ public class SubsListFragment extends Fragment{
                     && meta.getCode() == 200
                     && "queryCustomObjects".equals(meta.getMethod())) {
                 try {
-                    llista = responseJSON.getJSONArray("subscripcio_usuari");
+                    llista = responseJSON.getJSONArray("event");
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -103,31 +98,32 @@ public class SubsListFragment extends Fragment{
         @Override
         protected void onPostExecute(Void result)
         {
-            /*if (dia.isShowing()) {
+            if (dia.isShowing()) {
                 dia.dismiss();
-            } */
+            }
 
-            llistes = new ArrayList<Llista>();
+            List<Event> events;
+            events = new ArrayList<Event>();
 
+            int i;
             for (i = 0; i < llista.length(); i++) {
                 try {
                     JSONObject aux = llista.getJSONObject(i);
-                    String txtidlist = null;
-                    txtidlist = aux.getString("id_llista");
-                    String txtlistname = null;
-                    txtlistname = aux.getString("nom_llista");
-                    String txtlistdate = null;
-                    //txtlistdate = aux.getString("data");
-                    txtlistdate = "Test data";
-
-                    Llista llista_aux = new Llista(txtidlist,txtlistname,txtlistdate);
-                    llistes.add(llista_aux);
+                    String txteventid = null;
+                    txteventid = aux.getString("id");
+                    String txtEventName = null;
+                    txtEventName = aux.getString("id_event");
+                    String txtEventDate = null;
+                    txtEventDate = aux.getString("data");
+                    //String StrACS_idLlista, String StrEventName, String StrEventDate
+                    Event event_aux = new Event(txteventid,llista_id,txtEventName,txtEventDate);
+                    events.add(event_aux);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
             }
 
-            adapter = new LlistaAdapter(getActivity(),R.layout.llista2, llistes);
+            adapter = new EventAdapter(getActivity(),R.layout.user,events);
             adapter.notifyDataSetChanged();
 
             lv = (ListView)getView().findViewById(R.id.lvSubs);
@@ -136,14 +132,19 @@ public class SubsListFragment extends Fragment{
             lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 public void onItemClick(AdapterView<?> parent, View v,
                                         int position, long id) {
-                    Llista aux = llistes.get(position);
-                    llista_id = aux.getLlista_id();
+                    try {
+                        JSONObject auxJSON = llista.getJSONObject(position);
+                        event_id = auxJSON.getString("id");
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
 
-                    Intent myIntent = new Intent(getActivity().getApplicationContext(), subslistuser.class);
+                    Intent intent_Event = new Intent(getActivity().getApplicationContext(), subslistevent.class);
                     Bundle b = new Bundle();
                     b.putString("Llista", llista_id);
-                    myIntent.putExtras(b);
-                    startActivity(myIntent);
+                    b.putString("Event", event_id);
+                    intent_Event.putExtras(b);
+                    startActivity(intent_Event);
                 }
             });
         }
