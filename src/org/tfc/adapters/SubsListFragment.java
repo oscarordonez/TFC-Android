@@ -60,12 +60,13 @@ public class SubsListFragment extends Fragment{
     {
         //private ProgressDialog dia;
 
-        /*@Override
+        @Override
         protected void onPreExecute() {
-            dia = new ProgressDialog(getActivity());
-            dia.setMessage("Recuperant dades. Esperi...");
-            dia.show();
-        } */
+            setRetainInstance(true);
+            //dia = new ProgressDialog(getActivity());
+            //dia.setMessage("Recuperant dades. Esperi...");
+            //dia.show();
+        }
 
         @Override
         protected Void doInBackground(Void... params)

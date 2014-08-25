@@ -3,7 +3,7 @@
 <RelativeLayout  xmlns:android="http://schemas.android.com/apk/res/android"
                   android:layout_width="match_parent"
                   android:layout_height="wrap_content"
-                  android:orientation="vertical">
+                  android:orientation="horizontal">
     <ListView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -17,7 +17,7 @@
     <TextView
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:text="+ Llistajj"
+            android:text="+ LlistaHhihihi"
             android:id="@+id/id_NewList"
             android:layout_alignParentBottom="true"
             style="@android:style/TextAppearance.DeviceDefault.Medium"

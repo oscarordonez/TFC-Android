@@ -3,7 +3,7 @@
 <RelativeLayout
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:orientation="vertical"
+        android:orientation="horizontal"
         xmlns:android="http://schemas.android.com/apk/res/android">
 
 
@@ -44,9 +44,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/txtEventDate"
+            android:layout_toRightOf="@+id/textView1"
             android:layout_alignBottom="@+id/textView1"
             android:hint="Data event"
-            android:layout_toRightOf="@+id/textView1"
             android:layout_alignParentRight="true"/>
 
     <Button
@@ -67,7 +67,6 @@
             android:layout_height="wrap_content"
             android:text="Cancelar"
             android:id="@+id/btn_cancelevent"
-            android:singleLine="false"
             android:layout_toRightOf="@+id/btn_newevent"
             android:layout_alignTop="@+id/btn_newevent"
             android:minWidth="90dp"

@@ -4,6 +4,8 @@
     android:versionCode="1"
     android:versionName="1.0" >
 
+
+
     <uses-permission android:name="android.permission.VIBRATE"/>
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.CHANGE_CONFIGURATION"/>
@@ -14,71 +16,55 @@
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
+
         <activity
             android:name="org.tfc.patxangueitor.signin"
-            android:label="@string/app_name"
-            >
+            android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
         <activity
             android:name="org.tfc.patxangueitor.signup"
-            android:label="Crear nou usuari"
-            android:configChanges="orientation|keyboardHidden"/>
+            android:label="Crear nou usuari">
+         </activity>
         <activity
             android:name="org.tfc.patxangueitor.mainscreen"
-            android:label="@string/title_activity_mainscreen"
-            android:configChanges="orientation|keyboardHidden"
-            >
+            android:label="@string/title_activity_mainscreen">
         </activity>
         <activity
                 android:name="org.tfc.patxangueitor.subslistuser"
-                android:label="Subscripcions de llistes"
-                android:configChanges="keyboardHidden|orientation">
+                android:label="Subscripcions de llistes">
         </activity>
         <activity
                 android:name="org.tfc.patxangueitor.subslistevent"
-                android:label="Subscripcions de Events"
-                android:configChanges="keyboardHidden|orientation">
+                android:label="Subscripcions de Events">
         </activity>
         <activity
-            android:name="org.tfc.patxangueitor.eventlist"
-            android:label="Event Usuari"
-            android:configChanges="keyboardHidden|orientation">
-    </activity>
-        <activity
                 android:name="org.tfc.patxangueitor.adminlistuser"
-                android:label="Admin. Llistes usuaris"
-                android:configChanges="keyboardHidden|orientation">
+                android:label="Admin. Llistes usuaris">
         </activity>
         <activity
                 android:name="org.tfc.patxangueitor.adminlistevent"
-                android:label="Admin. Gestio Events"
-                android:configChanges="keyboardHidden|orientation">
+                android:label="Admin. Gestio Events">
         </activity>
         <activity
                 android:name=".act_newlist"
-                android:label="Crear nova llista"
-                android:configChanges="orientation|keyboardHidden">
+                android:label="Crear nova llista">
         </activity>
         <activity
                 android:name=".act_newuser"
-                android:label="Afegir nous usuaris"
-                android:configChanges="orientation|keyboardHidden">
+                android:label="Afegir nous usuaris">
         </activity>
         <activity
                 android:name=".act_newevent"
-                android:label="Afegir nou event"
-                android:configChanges="orientation|keyboardHidden">
+                android:label="Afegir nou event">
         </activity>
         <activity
                 android:name=".act_neweventuser"
-                android:label="Afegir nou usuari"
-                android:configChanges="orientation|keyboardHidden">
+                android:label="Afegir nou usuari">
         </activity>
 
     </application>

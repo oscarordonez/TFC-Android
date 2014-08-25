@@ -3,6 +3,8 @@ package org.tfc.patxangueitor;
 import android.app.FragmentTransaction;
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
+import android.content.res.Configuration;
 import android.os.AsyncTask;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
@@ -111,6 +113,7 @@ public class mainscreen extends FragmentActivity implements ActionBar.TabListene
 
         @Override
         protected void onPreExecute() {
+            lockScreenOrientation();
             dia = new ProgressDialog(mainscreen.this);
             dia.setMessage("Desconnectant...");
             dia.show();
@@ -130,6 +133,7 @@ public class mainscreen extends FragmentActivity implements ActionBar.TabListene
             if (dia.isShowing()) {
                 dia.dismiss();
             }
+            unlockScreenOrientation();
             if (booResult){
                 //toast_logout = Toast.makeText(getApplicationContext(),
                 //        "La sessió s'ha desconnectat", Toast.LENGTH_LONG);
@@ -165,5 +169,18 @@ public class mainscreen extends FragmentActivity implements ActionBar.TabListene
             e.printStackTrace();
         }
         return result;
+    }
+
+    private void lockScreenOrientation() {
+        int currentOrientation = getResources().getConfiguration().orientation;
+        if (currentOrientation == Configuration.ORIENTATION_PORTRAIT) {
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        } else {
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+        }
+    }
+
+    private void unlockScreenOrientation() {
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR);
     }
  }

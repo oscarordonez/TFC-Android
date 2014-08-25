@@ -3,6 +3,8 @@ package org.tfc.patxangueitor;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
+import android.content.res.Configuration;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
@@ -83,6 +85,7 @@ public class signup extends Activity {
 
         @Override
         protected void onPreExecute() {
+            lockScreenOrientation();
             dia = new ProgressDialog(signup.this);
             dia.setMessage("Processant. Esperi si us plau.");
             dia.show();
@@ -103,6 +106,7 @@ public class signup extends Activity {
             if (dia.isShowing()) {
                 dia.dismiss();
             }
+            unlockScreenOrientation();
             if (booResult){
                 Toast toast1 =
                         Toast.makeText(getApplicationContext(),
@@ -122,5 +126,18 @@ public class signup extends Activity {
                 toast2.show();
             }
         }
+    }
+
+    private void lockScreenOrientation() {
+        int currentOrientation = getResources().getConfiguration().orientation;
+        if (currentOrientation == Configuration.ORIENTATION_PORTRAIT) {
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        } else {
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+        }
+    }
+
+    private void unlockScreenOrientation() {
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR);
     }
 }

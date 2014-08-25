@@ -2,6 +2,8 @@ package org.tfc.patxangueitor;
 
 
 import android.app.ProgressDialog;
+import android.content.pm.ActivityInfo;
+import android.content.res.Configuration;
 import android.os.AsyncTask;
 import com.appcelerator.cloud.sdk.*;
 
@@ -106,6 +108,7 @@ public class signin extends Activity {
 
         @Override
         protected void onPreExecute() {
+            lockScreenOrientation();
             dia = new ProgressDialog(signin.this);
             dia.setMessage("Connectant. Esperi si us plau.");
             dia.show();
@@ -127,6 +130,7 @@ public class signin extends Activity {
             if (dia.isShowing()) {
                 dia.dismiss();
             }
+            unlockScreenOrientation();
             if (booResult){
                 Intent intent = new Intent(signin.this,mainscreen.class);
                 Bundle b = new Bundle();
@@ -145,5 +149,17 @@ public class signin extends Activity {
                 toast1.show();
             }
         }
+    }
+    private void lockScreenOrientation() {
+        int currentOrientation = getResources().getConfiguration().orientation;
+        if (currentOrientation == Configuration.ORIENTATION_PORTRAIT) {
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        } else {
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+        }
+    }
+
+    private void unlockScreenOrientation() {
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR);
     }
 }

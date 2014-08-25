@@ -15,7 +15,7 @@
     <string name="first_name">Nom</string>
     <string name="email_address">Correu</string>
     <string name="password">Contrassenya</string>
-    <string name="password_confirm">Conf. contrassenya</string>
+    <string name="password_confirm">Conf. contra.</string>
     <string name="Ok2_button">OK</string>
     <string name="cancel">Cancelar</string>
     <string name="title_activity_mainscreen">Principal</string>

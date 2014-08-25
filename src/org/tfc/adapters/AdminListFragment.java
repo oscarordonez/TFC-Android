@@ -2,6 +2,8 @@ package org.tfc.adapters;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
+import android.content.res.Configuration;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -57,7 +59,7 @@ public class AdminListFragment extends Fragment {
         user_id = bundle.getString("User");
 
         tv_newlist = (TextView)getView().findViewById(R.id.id_NewList);
-        tv_newlist.setText("+ Llista");
+        //tv_newlist.setText("+ Llista");
         tv_newlist.setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {
                 Intent intent_NewList = new Intent(getActivity().getApplicationContext(), act_newlist.class);
@@ -76,6 +78,7 @@ public class AdminListFragment extends Fragment {
 
         @Override
         protected void onPreExecute() {
+            setRetainInstance(true);
             dia = new ProgressDialog(getActivity());
             dia.setMessage("Recuperant dades. Esperi...");
             dia.show();
