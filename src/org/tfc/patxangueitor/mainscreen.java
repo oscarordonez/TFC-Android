@@ -96,6 +96,7 @@ public class mainscreen extends FragmentActivity implements ActionBar.TabListene
     @Override
     public void onTabUnselected(ActionBar.Tab tab, FragmentTransaction ft) {
     }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {

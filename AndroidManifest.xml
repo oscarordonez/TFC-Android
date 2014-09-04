@@ -48,7 +48,13 @@
         </activity>
         <activity
                 android:name="org.tfc.patxangueitor.adminlistuser"
-                android:label="Admin. Llistes usuaris">
+                android:label="Admin. Llistes usuaris"  >
+            <!--    android:parentActivityName="mainscreen" >
+            Parent activity meta-data to support 4.0 and lower
+            <meta-data
+                    android:name="android.support.PARENT_ACTIVITY"
+                    android:value="mainscreen" />     -->
+
         </activity>
         <activity
                 android:name="org.tfc.patxangueitor.adminlistevent"

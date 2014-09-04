@@ -28,6 +28,8 @@ public class adminlistuser extends FragmentActivity implements ActionBar.TabList
         mAdapter = new TabsPagerAdapter2(getSupportFragmentManager());
         viewPager.setAdapter(mAdapter);
         actionBar.setHomeButtonEnabled(true);
+        actionBar.setDisplayHomeAsUpEnabled(true);
+        actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 
 
