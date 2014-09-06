@@ -1,9 +1,12 @@
 package org.tfc.adapters;
 
 import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
-import android.content.pm.ActivityInfo;
-import android.content.res.Configuration;
+import android.content.IntentFilter;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -38,22 +41,44 @@ public class AdminListFragment extends Fragment {
     private LlistaAdapter adapter;
     private List<Llista> llistes;
 
+    public static boolean loadData = true;
+
+    private NetworkReceiver receiver = new NetworkReceiver();
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         return inflater.inflate(R.layout.adminlist, container, false);
     }
 
+    @Override
     public void onResume(){
         super.onResume();
-        LoadListTask taskload= new LoadListTask();
-        taskload.execute();
+
+        // Register BroadcastReceiver to track connection changes.
+        IntentFilter filter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
+        receiver = new NetworkReceiver();
+        getActivity().registerReceiver(receiver, filter);
+
+        if (loadData == true){
+            LoadListTask taskload= new LoadListTask();
+            taskload.execute();
         }
+    }
+
+    @Override
+    public void onPause(){
+        super.onPause();
+        //if (receiver != null) {
+            getActivity().unregisterReceiver(receiver);
+        //}
+    }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState)
     {
         super.onActivityCreated(savedInstanceState);
+
         llista = new JSONArray();
         Bundle bundle = getActivity().getIntent().getExtras();
         user_id = bundle.getString("User");
@@ -67,8 +92,30 @@ public class AdminListFragment extends Fragment {
             }
         });
 
-        LoadListTask taskload= new LoadListTask();
-        taskload.execute();
+        if (loadData == true){
+            LoadListTask taskload= new LoadListTask();
+            taskload.execute();
+        }
+    }
+
+
+    public class NetworkReceiver extends BroadcastReceiver {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            ConnectivityManager connMgr = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+            NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
+
+            // Check if network connection is available
+            if (networkInfo != null && (networkInfo.getType() == ConnectivityManager.TYPE_MOBILE || networkInfo.getType() == ConnectivityManager.TYPE_WIFI)){
+
+                loadData = true;
+            }
+            else{
+                loadData = false;
+                Toast.makeText(context, "Desconnexió", Toast.LENGTH_SHORT).show();
+            }
+        }
     }
 
     private class LoadListTask extends AsyncTask<Void, Void, Void>

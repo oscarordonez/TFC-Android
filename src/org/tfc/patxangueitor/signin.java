@@ -2,8 +2,13 @@ package org.tfc.patxangueitor;
 
 
 import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.IntentFilter;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import com.appcelerator.cloud.sdk.*;
 
@@ -27,14 +32,21 @@ public class signin extends Activity {
     protected boolean booResult;
     protected String txtLogin;
     protected String txtPass;
-    protected int mCurrentScore;
-    protected int mCurrentLevel;
+
+    public static boolean loadData = true;
+
+    private NetworkReceiver receiver = new NetworkReceiver();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.signin);
+
+        // Register BroadcastReceiver to track connection changes.
+        IntentFilter filter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
+        receiver = new NetworkReceiver();
+        this.registerReceiver(receiver, filter);
 
         View connectbtn = findViewById(R.id.btnOk);
 
@@ -48,8 +60,12 @@ public class signin extends Activity {
                 ((EditText) findViewById(R.id.txt_pass)).setText("");
                 //final ProgressDialog dialog = ProgressDialog.show(signin.this, "","Connectant...", true);
 
-                SignInTask tasksignin= new SignInTask();
-                tasksignin.execute();
+                if (loadData == true){
+                    SignInTask tasksignin= new SignInTask();
+                    tasksignin.execute();
+                }
+                else
+                    Toast.makeText(getApplicationContext(), "no tens internete", Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -65,6 +81,32 @@ public class signin extends Activity {
                 startActivity(intent3);
             }
         });
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (receiver != null) {
+            this.unregisterReceiver(receiver);
+        }
+    }
+
+    public class NetworkReceiver extends BroadcastReceiver {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            ConnectivityManager connMgr = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+            NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
+
+            // Check if network connection is available
+            if (networkInfo != null && (networkInfo.getType() == ConnectivityManager.TYPE_MOBILE || networkInfo.getType() == ConnectivityManager.TYPE_WIFI)){
+                //Toast.makeText(context, networkInfo.getType(), Toast.LENGTH_SHORT).show();
+                loadData = true;
+            }
+            else
+                loadData = false;
+
+            }
     }
 
     public void performsignin(String strLogin, String strPass){
@@ -132,6 +174,9 @@ public class signin extends Activity {
             }
             unlockScreenOrientation();
             if (booResult){
+                //if (receiver != null) {
+                //    signin.this.unregisterReceiver(receiver);
+                //}
                 Intent intent = new Intent(signin.this,mainscreen.class);
                 Bundle b = new Bundle();
                 b.putString("Status","Connected");

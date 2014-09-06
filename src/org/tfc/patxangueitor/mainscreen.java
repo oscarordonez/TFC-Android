@@ -2,9 +2,14 @@ package org.tfc.patxangueitor;
 
 import android.app.FragmentTransaction;
 import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
@@ -37,6 +42,7 @@ public class mainscreen extends FragmentActivity implements ActionBar.TabListene
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_mainscreen);
 
         //Recuperamos la información pasada en el intent
@@ -56,25 +62,25 @@ public class mainscreen extends FragmentActivity implements ActionBar.TabListene
             actionBar.addTab(actionBar.newTab().setText(tab_name)
                     .setTabListener(this));
         }
+            viewPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
 
-        viewPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+                @Override
+                public void onPageSelected(int position) {
+                    // on changing the page
+                    // make respected tab selected
+                    actionBar.setSelectedNavigationItem(position);
+                }
 
-            @Override
-            public void onPageSelected(int position) {
-                // on changing the page
-                // make respected tab selected
-                actionBar.setSelectedNavigationItem(position);
-            }
+                @Override
+                public void onPageScrolled(int arg0, float arg1, int arg2) {
+                }
 
-            @Override
-            public void onPageScrolled(int arg0, float arg1, int arg2) {
-            }
-
-            @Override
-            public void onPageScrollStateChanged(int arg0) {
-            }
-        });
+                @Override
+                public void onPageScrollStateChanged(int arg0) {
+                }
+            });
     }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -107,6 +113,7 @@ public class mainscreen extends FragmentActivity implements ActionBar.TabListene
         }
         return true;
     }
+
 
     private class LogOutTask extends AsyncTask<Void, Void, Boolean>
     {
