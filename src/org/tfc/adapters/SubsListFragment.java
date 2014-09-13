@@ -56,12 +56,15 @@ public class SubsListFragment extends Fragment{
         Bundle bundle = getActivity().getIntent().getExtras();
         user_id = bundle.getString("User");
 
+        if (checkConnection())
+            loadData = true;
+        else
+            loadData = false;
+
         if (loadData == true){
             LoadListTask taskload= new LoadListTask();
             taskload.execute();
         }
-        //else
-            //Toast.makeText(getActivity(),NOT_CONNECTED_TEXT, Toast.LENGTH_LONG).show();
     }
 
     @Override
@@ -72,12 +75,15 @@ public class SubsListFragment extends Fragment{
         receiver = new NetworkReceiver();
         getActivity().registerReceiver(receiver, filter);
 
+        if (checkConnection())
+            loadData = true;
+        else
+            loadData = false;
+
         if (loadData == true){
             LoadListTask taskload= new LoadListTask();
             taskload.execute();
         }
-        //else
-        //    Toast.makeText(getActivity(),NOT_CONNECTED_TEXT, Toast.LENGTH_LONG).show();
     }
 
     @Override
@@ -99,6 +105,19 @@ public class SubsListFragment extends Fragment{
             else
                 loadData = false;
         }
+    }
+
+    private Boolean checkConnection(){
+        Boolean booLoad;
+        ConnectivityManager connMgr = (ConnectivityManager) getActivity().getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
+
+        if (networkInfo != null && networkInfo.isConnected())
+            booLoad = true;
+        else
+            booLoad = false;
+
+        return booLoad;
     }
 
     private class LoadListTask extends AsyncTask<Void, Void, Void>

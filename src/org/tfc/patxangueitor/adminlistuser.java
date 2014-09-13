@@ -110,6 +110,11 @@ public class adminlistuser extends FragmentActivity implements ActionBar.TabList
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_logout:
+                if (checkConnection())
+                    loadData = true;
+                else
+                    loadData = false;
+
                 if (loadData){
                     LogOutTask tasklogout= new LogOutTask();
                     tasklogout.execute();
@@ -133,6 +138,19 @@ public class adminlistuser extends FragmentActivity implements ActionBar.TabList
             else
                 loadData = false;
         }
+    }
+
+    private Boolean checkConnection(){
+        Boolean booLoad;
+        ConnectivityManager connMgr = (ConnectivityManager) this.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
+
+        if (networkInfo != null && networkInfo.isConnected())
+            booLoad = true;
+        else
+            booLoad = false;
+
+        return booLoad;
     }
 
     private class LogOutTask extends AsyncTask<Void, Void, Boolean>
@@ -161,7 +179,7 @@ public class adminlistuser extends FragmentActivity implements ActionBar.TabList
             }
             if (booResult){
                 Toast.makeText(getApplicationContext(),SESSION_DISCONNECTED_TEXT, Toast.LENGTH_LONG).show();
-                finish();
+                //finish();
             }
             else
                 Toast.makeText(getApplicationContext(),SESSION_NOT_DISCONNECTED_TEXT, Toast.LENGTH_LONG).show();

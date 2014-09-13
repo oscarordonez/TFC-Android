@@ -2,12 +2,19 @@ package org.tfc.patxangueitor;
 
 import android.app.ActionBar;
 import android.app.FragmentTransaction;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 import com.appcelerator.cloud.sdk.*;
 import org.json.JSONObject;
 import org.tfc.adapters.*;
@@ -21,27 +28,32 @@ public class adminlistevent extends FragmentActivity implements ActionBar.TabLis
     private ViewPager viewPager;
     private TabsPagerAdapter3 mAdapter;
     private ActionBar actionBar;
-    public final static String APP_KEY = "iGXpZFRj2XCl9Aixrig80d0rrftOzRef";
     private String txtTextToSend = "Tens una nova convocatòria";
+
     // Tab titles
     private String[] tabs = { "Dades", "Usuaris" };
+    public final static String APP_KEY = "iGXpZFRj2XCl9Aixrig80d0rrftOzRef";
+    public final static String NOT_CONNECTED_TEXT = "No hi ha connexió de dades. No es pot realitzar l'operació";
 
+    public static boolean loadData = true;
+    private NetworkReceiver receiver = new NetworkReceiver();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_mainscreen);
 
-        // Initilization
+        IntentFilter filter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
+        receiver = new NetworkReceiver();
+        this.registerReceiver(receiver, filter);
 
+        // Initilization
         viewPager = (ViewPager) findViewById(R.id.pager);
         actionBar = getActionBar();
         mAdapter = new TabsPagerAdapter3(getSupportFragmentManager());
         viewPager.setAdapter(mAdapter);
         actionBar.setHomeButtonEnabled(false);
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
-
-
 
         // Adding Tabs
         for (String tab_name : tabs) {
@@ -70,7 +82,6 @@ public class adminlistevent extends FragmentActivity implements ActionBar.TabLis
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu items for use in the action bar
         getMenuInflater().inflate(R.menu.menu_adminlistevent, menu);
         return super.onCreateOptionsMenu(menu);
     }
@@ -100,6 +111,20 @@ public class adminlistevent extends FragmentActivity implements ActionBar.TabLis
     public void onTabUnselected(ActionBar.Tab tab, FragmentTransaction ft) {
     }
 
+    public class NetworkReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            ConnectivityManager connMgr = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+            NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
+
+            if (networkInfo != null && networkInfo.isConnected()){
+                loadData = true;
+            }
+            else
+                loadData = false;
+        }
+    }
+
     private class SendPushTask extends AsyncTask<Void, Void, Boolean>
     {
         @Override
@@ -111,13 +136,15 @@ public class adminlistevent extends FragmentActivity implements ActionBar.TabLis
             Map<String, Object> data = new HashMap<String, Object>();
             data.put("channel", "event");
             data.put("to_tokens", "everyone");
+            data.put("alert", txtTextToSend);
+            data.put("sound", "default");
             data.put("payload", txtTextToSend);
             try {
                 response = sdk.sendRequest("push_notification/notify_tokens.json", CCRequestMethod.POST, data);
             } catch (ACSClientError acsClientError) {
-                acsClientError.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                acsClientError.printStackTrace();
             } catch (IOException e) {
-                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                e.printStackTrace();
             }
 
             JSONObject responseJSON = response.getResponseData();

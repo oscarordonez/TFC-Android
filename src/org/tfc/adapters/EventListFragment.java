@@ -70,12 +70,17 @@ public class EventListFragment extends Fragment {
             }
         });
 
+        if (checkConnection())
+            loadData = true;
+        else
+            loadData = false;
+
         if (loadData){
             LoadEventsTask eventload= new LoadEventsTask();
             eventload.execute();
         }
         else
-            Toast.makeText(getActivity(), NOT_CONNECTED_TEXT, Toast.LENGTH_LONG).show();
+            Toast.makeText(getActivity(), NOT_CONNECTED_TEXT, Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -86,12 +91,17 @@ public class EventListFragment extends Fragment {
         receiver = new NetworkReceiver();
         getActivity().registerReceiver(receiver, filter);
 
+        if (checkConnection())
+            loadData = true;
+        else
+            loadData = false;
+
         if (loadData){
             LoadEventsTask eventload= new LoadEventsTask();
             eventload.execute();
         }
         else
-            Toast.makeText(getActivity(),NOT_CONNECTED_TEXT, Toast.LENGTH_LONG).show();
+            Toast.makeText(getActivity(),NOT_CONNECTED_TEXT, Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -115,6 +125,18 @@ public class EventListFragment extends Fragment {
         }
     }
 
+    private Boolean checkConnection(){
+        Boolean booLoad;
+        ConnectivityManager connMgr = (ConnectivityManager) getActivity().getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
+
+        if (networkInfo != null && networkInfo.isConnected())
+            booLoad = true;
+        else
+            booLoad = false;
+
+        return booLoad;
+    }
 
     private class LoadEventsTask extends AsyncTask<Void, Void, Void>
     {
@@ -271,7 +293,6 @@ public class EventListFragment extends Fragment {
         }
     }
 
-
     private ActionMode.Callback mActionModeCallback = new ActionMode.Callback() {
 
         // Called when the action mode is created; startActionMode() was called
@@ -295,12 +316,17 @@ public class EventListFragment extends Fragment {
         public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
             switch (item.getItemId()) {
                 case R.id.action_delete:
+                    if (checkConnection())
+                        loadData = true;
+                    else
+                        loadData = false;
+
                     if (loadData){
                         DelEventTask taskDelEventUser= new DelEventTask();
                         taskDelEventUser.execute();
                     }
-                    //else
-                    //    Toast.makeText(getActivity(), NOT_CONNECTED_TEXT, Toast.LENGTH_LONG).show();
+                    else
+                        Toast.makeText(getActivity(), NOT_CONNECTED_TEXT, Toast.LENGTH_LONG).show();
                     mode.finish();
                     return true;
                 default:

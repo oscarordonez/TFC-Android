@@ -2,6 +2,12 @@ package org.tfc.patxangueitor;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
@@ -31,19 +37,75 @@ public class act_neweventuser extends Activity {
     private JSONArray llista;
     private UserAdapter adapter;
 
+    public final static String APP_KEY = "iGXpZFRj2XCl9Aixrig80d0rrftOzRef";
+    public final static String NOT_CONNECTED_TEXT = "No hi ha connexió de dades. No es pot realitzar l'operació";
+    public final static String PROCESSING_TEXT = "Carregant usuaris de l'event. Esperi si us plau.";
+    public final static String PROCESSING_TEXT2 = "Afegint usuari a l'event... Esperi si us plau";
+    public final static String USER_CREATED_TEXT = "S'ha afegit un nou usuari a l'event";
+    public final static String USER_NOT_CREATED_TEXT = "No s'ha pogut sfegir l'usuari. Torna-ho a provar, si us plau";
+
+    public static boolean loadData = true;
+    private NetworkReceiver receiver = new NetworkReceiver();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.newuser);
 
-        llista = new JSONArray();
+        IntentFilter filter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
+        receiver = new NetworkReceiver();
+        this.registerReceiver(receiver, filter);
 
+        llista = new JSONArray();
         Bundle b = this.getIntent().getExtras();
         llista_id = b.getString("Llista");
         event_id = b.getString("Event");
 
-        LoadEventUsersTask taskloadallusers = new LoadEventUsersTask();
-        taskloadallusers.execute();
+        if (checkConnection())
+            loadData = true;
+        else
+            loadData = false;
+
+        if (loadData){
+            LoadEventUsersTask taskloadallusers = new LoadEventUsersTask();
+            taskloadallusers.execute();
+        }
+        else
+            Toast.makeText(getApplicationContext(),NOT_CONNECTED_TEXT, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (receiver != null) {
+            this.unregisterReceiver(receiver);
+        }
+    }
+
+    public class NetworkReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            ConnectivityManager connMgr = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+            NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
+
+            if (networkInfo != null && networkInfo.isConnected())
+                loadData = true;
+            else
+                loadData = false;
+        }
+    }
+
+    private Boolean checkConnection(){
+        Boolean booLoad;
+        ConnectivityManager connMgr = (ConnectivityManager) this.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
+
+        if (networkInfo != null && networkInfo.isConnected())
+            booLoad = true;
+        else
+            booLoad = false;
+
+        return booLoad;
     }
 
     private class LoadEventUsersTask extends AsyncTask<Void, Void, Boolean>
@@ -53,58 +115,29 @@ public class act_neweventuser extends Activity {
         @Override
         protected void onPreExecute() {
             dia = new ProgressDialog(act_neweventuser.this);
-            dia.setMessage("Carregant usuaris event");
+            dia.setMessage(PROCESSING_TEXT);
             dia.show();
         }
 
         @Override
         protected Boolean doInBackground(Void... params)
         {
-            /*ACSClient sdk = new ACSClient("iGXpZFRj2XCl9Aixrig80d0rrftOzRef",getApplicationContext());
-            CCResponse response = null;
-
-            try {
-                response = sdk.sendRequest("users/search.json", CCRequestMethod.GET, null);
-            } catch (ACSClientError acsClientError) {
-                acsClientError.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            JSONObject responseJSON = response.getResponseData();
-            CCMeta meta = response.getMeta();
-            if("ok".equals(meta.getStatus())
-                    && meta.getCode() == 200
-                    && "searchUsers".equals(meta.getMethod())) {
-                try {
-                    users = responseJSON.getJSONArray("users");
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-            return null;*/
-            return loadeventusers();
+            return loadEventUsers();
 
         }
 
         @Override
         protected void onPostExecute(Boolean booresult)
         {
-            if (dia.isShowing()) {
+            if (dia.isShowing())
                 dia.dismiss();
-            }
 
             List<User> users;
             users = new ArrayList<User>();
-
             int i;
             for (i = 0; i < llista.length(); i++) {
                 try {
                     JSONObject aux = llista.getJSONObject(i);
-                    /* Test adapter*/
-                    //values.add(i, aux.getString("id_usuari"));
-                    //JSONObject userdata = aux.getJSONObject("user");
-                    //String StrACS_id, String StrUser, String StrFirstName, String StrEmail
                     String txtidobj = null;
                     txtidobj = aux.getString("id");
                     String txtiduser = null;
@@ -123,20 +156,16 @@ public class act_neweventuser extends Activity {
                 }
             }
 
-            /* Test adapter */
-            //adapter = new ArrayAdapter<String>(getActivity(),android.R.layout.simple_list_item_1, values);
             adapter = new UserAdapter(act_neweventuser.this,R.layout.user, users);
             adapter.notifyDataSetChanged();
 
             lv = (ListView)findViewById(R.id.lvNewUsers);
             lv.setAdapter(adapter);
-
             lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 public void onItemClick(AdapterView<?> parent, View v,
                                         int position, long id) {
                     try {
                         auxJSON = llista.getJSONObject(position);
-                        //llista_id = auxJSON.getString("id");
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
@@ -145,36 +174,6 @@ public class act_neweventuser extends Activity {
 
                 }
             });
-
-            /*ArrayList<String> values = new ArrayList<String>();
-            for (i = 0; i < users.length(); i++) {
-                try {
-                    auxJSON = users.getJSONObject(i);
-                    values.add(i, auxJSON.getString("username"));
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-            adapter = new ArrayAdapter<String>(act_neweventuser.this,android.R.layout.simple_list_item_1, values);
-            adapter.notifyDataSetChanged();
-
-            lv = (ListView)findViewById(R.id.lvNewUsers);
-            lv.setAdapter(adapter);
-
-            lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                public void onItemClick(AdapterView<?> parent, View v,
-                                        int position, long id) {
-                    try {
-                        auxJSON = users.getJSONObject(position);
-                        //llista_id = auxJSON.getString("id");
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                    AddUserToListTask taskaddusertolist= new AddUserToListTask();
-                    taskaddusertolist.execute();
-
-                }
-            });*/
         }
     }
 
@@ -185,73 +184,34 @@ public class act_neweventuser extends Activity {
         @Override
         protected void onPreExecute() {
             dia = new ProgressDialog(act_neweventuser.this);
-            dia.setMessage("Afegint usuari a l'event...");
+            dia.setMessage(PROCESSING_TEXT2);
             dia.show();
         }
 
         @Override
         protected Boolean doInBackground(Void... params)
         {
-            /*ACSClient sdk = new ACSClient("iGXpZFRj2XCl9Aixrig80d0rrftOzRef",getApplicationContext());
-            CCResponse response = null;
-
-            try {
-                response = sdk.sendRequest("users/search.json", CCRequestMethod.GET, null);
-            } catch (ACSClientError acsClientError) {
-                acsClientError.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            JSONObject responseJSON = response.getResponseData();
-            CCMeta meta = response.getMeta();
-            if("ok".equals(meta.getStatus())
-                    && meta.getCode() == 200
-                    && "searchUsers".equals(meta.getMethod())) {
-                try {
-                    users = responseJSON.getJSONArray("users");
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-            return null;*/
-            return addeventusertolist();
-
+            return addEventUserToList();
         }
 
         @Override
         protected void onPostExecute(Boolean booResult)
         {
-            if (dia.isShowing()) {
+            if (dia.isShowing())
                 dia.dismiss();
-            }
-            if (booResult){
-                Toast toast1 =
-                        Toast.makeText(getApplicationContext(),
-                                "Usuari afegit a l'event", Toast.LENGTH_LONG);
-                toast1.show();
+
+            if (booResult) {
+                Toast.makeText(getApplicationContext(),USER_CREATED_TEXT, Toast.LENGTH_LONG).show();
                 finish();
             }
             else
-            {
-                Toast toast2 =
-                        Toast.makeText(getApplicationContext(),
-                                "Hi hagut un error a l'afegir l'usuari. Torna-ho a provar, si us plau", Toast.LENGTH_LONG);
-                toast2.show();
-            }
-
+                Toast.makeText(getApplicationContext(),USER_NOT_CREATED_TEXT, Toast.LENGTH_LONG).show();
         }
     }
 
-    public boolean addeventusertolist(){
-        ACSClient sdk = new ACSClient("iGXpZFRj2XCl9Aixrig80d0rrftOzRef",getApplicationContext());
+    public boolean addEventUserToList(){
+        ACSClient sdk = new ACSClient(APP_KEY,getApplicationContext());
         Boolean booStatus = false;
-
-        //HashMap<String, Object> dataMap = new HashMap<String, Object>();
-        //dataMap.put("id_llista", "533df8de891fdf43ba086f5d");
-        //dataMap.put("id_usuari", "oscarino");
-
-
         Map<String, Object> data = new HashMap<String, Object>();
 
         String txtuserid = null;
@@ -260,18 +220,21 @@ public class act_neweventuser extends Activity {
         } catch (JSONException e) {
             e.printStackTrace();
         }
+
         String txtusername = null;
         try {
             txtusername = auxJSON.getString("username");
         } catch (JSONException e) {
             e.printStackTrace();
         }
+
         String txtfirstname = null;
         try {
             txtfirstname = auxJSON.getString("first_name");
         } catch (JSONException e) {
             e.printStackTrace();
         }
+
         String txtemail = null;
         try {
             txtemail = auxJSON.getString("email");
@@ -281,7 +244,6 @@ public class act_neweventuser extends Activity {
 
         data.put("fields", "{\"id_llista\" : \"" + llista_id + "\" , \"id_event\": \"" + event_id + "\", \"id_user\": \"" + txtuserid + "\", \"username\": \"" + txtusername + "\", \"firstname\": \"" + txtfirstname
                 + "\", \"email\": \"" + txtemail + "\"}");
-
 
         try {
             CCResponse response = sdk.sendRequest("objects/subscripcio_event/create.json", CCRequestMethod.POST, data);
@@ -299,11 +261,10 @@ public class act_neweventuser extends Activity {
         return booStatus;
     }
 
-    public boolean loadeventusers(){
-        ACSClient sdk = new ACSClient("iGXpZFRj2XCl9Aixrig80d0rrftOzRef",getApplicationContext());
+    public boolean loadEventUsers(){
+        ACSClient sdk = new ACSClient(APP_KEY,getApplicationContext());
         CCResponse response = null;
-        boolean result;
-        result = false;
+        Boolean booResult = false;
 
         Map<String, Object> data = new HashMap<String, Object>();
         data.put("where", "{\"id_llista\" : \"" + llista_id + "\"}");
@@ -324,11 +285,11 @@ public class act_neweventuser extends Activity {
                 && "queryCustomObjects".equals(meta.getMethod())) {
             try {
                 llista = responseJSON.getJSONArray("subscripcio_usuari");
-                result = true;
+                booResult = true;
             } catch (JSONException e) {
                 e.printStackTrace();
             }
         }
-        return result;
+        return booResult;
     }
 }

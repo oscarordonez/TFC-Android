@@ -132,10 +132,6 @@ public class signin extends Activity {
             {
                 ((EditText) findViewById(R.id.txt_user)).setText("");
                 ((EditText) findViewById(R.id.txt_pass)).setText("");
-                //Toast toast1 =
-                //        Toast.makeText(getApplicationContext(),
-                //                "Usuari / Contrasenya incorrectes", Toast.LENGTH_LONG);
-                //toast1.show();
                 Toast.makeText(getApplicationContext(),NO_LOGIN, Toast.LENGTH_LONG).show();
             }
         }

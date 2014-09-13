@@ -70,12 +70,17 @@ public class AdminListFragment extends Fragment {
             }
         });
 
+        if (checkConnection())
+            loadData = true;
+        else
+            loadData = false;
+
         if (loadData){
             LoadListTask taskload= new LoadListTask();
             taskload.execute();
         }
-        //else
-        //    Toast.makeText(getActivity(),NOT_CONNECTED_TEXT, Toast.LENGTH_LONG).show();
+        else
+            Toast.makeText(getActivity(), NOT_CONNECTED_TEXT, Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -86,12 +91,17 @@ public class AdminListFragment extends Fragment {
         receiver = new NetworkReceiver();
         getActivity().registerReceiver(receiver, filter);
 
+        if (checkConnection())
+            loadData = true;
+        else
+            loadData = false;
+
         if (loadData){
             LoadListTask taskload= new LoadListTask();
             taskload.execute();
         }
-        //else
-        //    Toast.makeText(getActivity(),NOT_CONNECTED_TEXT, Toast.LENGTH_LONG).show();
+        else
+            Toast.makeText(getActivity(), NOT_CONNECTED_TEXT, Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -113,6 +123,19 @@ public class AdminListFragment extends Fragment {
             else
                 loadData = false;
         }
+    }
+
+    private Boolean checkConnection(){
+        Boolean booLoad;
+        ConnectivityManager connMgr = (ConnectivityManager) getActivity().getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
+
+        if (networkInfo != null && networkInfo.isConnected())
+            booLoad = true;
+        else
+            booLoad = false;
+
+        return booLoad;
     }
 
     private class LoadListTask extends AsyncTask<Void, Void, Void>

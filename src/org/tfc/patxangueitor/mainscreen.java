@@ -211,25 +211,6 @@ public class mainscreen extends FragmentActivity implements ActionBar.TabListene
         return booResult;
     }
 
-    private class UnSubscribeTask extends AsyncTask<Void, Void, Void>
-    {
-        @Override
-        protected Void doInBackground(Void... params)
-        {
-            ACSClient sdk = new ACSClient(APP_KEY,getApplicationContext());
-            try {
-                PushNotificationsManager.unsubscribePushNotifications(sdk, mDeviceID, "event");
-            } catch (IOException e) {
-                e.printStackTrace();
-            } catch (ACSClientError acsClientError) {
-                acsClientError.printStackTrace();
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-            return null;
-        }
-    }
-
     private class GetDeviceIDTask extends AsyncTask<Void, Void, Void>
     {
         @Override
@@ -277,8 +258,8 @@ public class mainscreen extends FragmentActivity implements ActionBar.TabListene
                 SubscribeTask tasksubscribe= new SubscribeTask();
                 tasksubscribe.execute();
             }
-            else
-                Toast.makeText(getApplicationContext(),NOT_CONNECTED_TEXT, Toast.LENGTH_LONG).show();
+           // else
+           //     Toast.makeText(getApplicationContext(),NOT_CONNECTED_TEXT, Toast.LENGTH_LONG).show();
             //SubscribeTask tasksubscribe= new SubscribeTask();
             //tasksubscribe.execute();
         }
@@ -292,6 +273,25 @@ public class mainscreen extends FragmentActivity implements ActionBar.TabListene
             ACSClient sdk = new ACSClient(APP_KEY,getApplicationContext());
             try {
                 PushNotificationsManager.subscribePushNotifications(sdk, mDeviceID, "event");
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (ACSClientError acsClientError) {
+                acsClientError.printStackTrace();
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+    }
+
+    private class UnSubscribeTask extends AsyncTask<Void, Void, Void>
+    {
+        @Override
+        protected Void doInBackground(Void... params)
+        {
+            ACSClient sdk = new ACSClient(APP_KEY,getApplicationContext());
+            try {
+                PushNotificationsManager.unsubscribePushNotifications(sdk, mDeviceID, "event");
             } catch (IOException e) {
                 e.printStackTrace();
             } catch (ACSClientError acsClientError) {

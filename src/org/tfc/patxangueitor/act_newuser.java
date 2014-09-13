@@ -56,12 +56,17 @@ public class act_newuser extends Activity {
         llista_id = b.getString("Llista");
         nom_llista = b.getString("NomLlista");
 
+        if (checkConnection())
+            loadData = true;
+        else
+            loadData = false;
+
         if (loadData){
             LoadAllUsersTask taskloadallusers= new LoadAllUsersTask();
             taskloadallusers.execute();
         }
         else
-            Toast.makeText(getApplicationContext(),NOT_CONNECTED_TEXT, Toast.LENGTH_LONG).show();
+            Toast.makeText(getApplicationContext(),NOT_CONNECTED_TEXT, Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -85,6 +90,18 @@ public class act_newuser extends Activity {
         }
     }
 
+    private Boolean checkConnection(){
+        Boolean booLoad;
+        ConnectivityManager connMgr = (ConnectivityManager) this.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
+
+        if (networkInfo != null && networkInfo.isConnected())
+            booLoad = true;
+        else
+            booLoad = false;
+
+        return booLoad;
+    }
 
     private class LoadAllUsersTask extends AsyncTask<Void, Void, Boolean>
     {
@@ -139,7 +156,7 @@ public class act_newuser extends Activity {
                         taskaddusertolist.execute();
                     }
                     else
-                        Toast.makeText(getApplicationContext(),NOT_CONNECTED_TEXT, Toast.LENGTH_LONG).show();
+                        Toast.makeText(getApplicationContext(),NOT_CONNECTED_TEXT, Toast.LENGTH_SHORT).show();
                 }
             });
         }

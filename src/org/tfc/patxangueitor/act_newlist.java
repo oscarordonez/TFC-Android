@@ -1,7 +1,12 @@
 package org.tfc.patxangueitor;
 
 import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
@@ -11,9 +16,6 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 import com.appcelerator.cloud.sdk.*;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.tfc.fragments.DatePickerFragment;
 import org.tfc.fragments.TimePickerFragment;
 
@@ -27,18 +29,29 @@ public class act_newlist extends FragmentActivity {
     String listName;
     String listPlace;
     String listDate;
-    protected boolean booResult;
+
+    public final static String APP_KEY = "iGXpZFRj2XCl9Aixrig80d0rrftOzRef";
+    public final static String NOT_CONNECTED_TEXT = "No hi ha connexió de dades. No es pot realitzar l'operació";
+    public final static String PROCESSING_TEXT = "Creant llista. Esperi si us plau.";
+    public final static String LIST_CREATED_TEXT = "S'ha creat una nova llista";
+    public final static String LIST_NOT_CREATED_TEXT = "No s'ha pogut crear la llista. Torna-ho a provar, si us plau";
+
+    public static boolean loadData = true;
+    private NetworkReceiver receiver = new NetworkReceiver();
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.newlist);
+
+        IntentFilter filter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
+        receiver = new NetworkReceiver();
+        this.registerReceiver(receiver, filter);
 
         View createlistbtn = findViewById(R.id.btnnewlist_ok);
         View cancellistbtn = findViewById(R.id.btnnewlist_cancel);
 
         et_Date = (TextView) findViewById(R.id.txtnewlist_date);
         et_Time = (TextView) findViewById(R.id.txtnewlist_time);
-
 
         cancellistbtn.setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {
@@ -51,10 +64,117 @@ public class act_newlist extends FragmentActivity {
                 listDate = ((TextView) findViewById(R.id.txtnewlist_date)).getText().toString();
                 listPlace = ((EditText) findViewById(R.id.txtnewlist_place)).getText().toString();
 
-                CreateListTask taskcreatelist= new CreateListTask();
-                taskcreatelist.execute();
+                if (checkConnection())
+                    loadData = true;
+                else
+                    loadData = false;
+
+                if (loadData){
+                    CreateListTask taskcreatelist= new CreateListTask();
+                    taskcreatelist.execute();
+                }
+                else
+                    Toast.makeText(getApplicationContext(),NOT_CONNECTED_TEXT, Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (receiver != null) {
+            this.unregisterReceiver(receiver);
+        }
+    }
+
+    public class NetworkReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            ConnectivityManager connMgr = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+            NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
+
+            if (networkInfo != null && networkInfo.isConnected())
+                loadData = true;
+            else
+                loadData = false;
+        }
+    }
+
+    private Boolean checkConnection(){
+        Boolean booLoad;
+        ConnectivityManager connMgr = (ConnectivityManager) this.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
+
+        if (networkInfo != null && networkInfo.isConnected())
+            booLoad = true;
+        else
+            booLoad = false;
+
+        return booLoad;
+    }
+
+    private class CreateListTask extends AsyncTask<Void, Void, Boolean>
+    {
+        private ProgressDialog dia;
+
+        @Override
+        protected void onPreExecute() {
+            dia = new ProgressDialog(act_newlist.this);
+            dia.setMessage(PROCESSING_TEXT);
+            dia.show();
+            dia.setCancelable(false);
+        }
+
+        @Override
+        protected Boolean doInBackground(Void... params)
+        {
+            return createlist(listName,listPlace,listDate);
+        }
+
+        @Override
+        protected void onPostExecute(Boolean booResult)
+        {
+            if (dia.isShowing())
+                dia.dismiss();
+
+            if (booResult){
+                Toast.makeText(getApplicationContext(),LIST_CREATED_TEXT, Toast.LENGTH_SHORT).show();
+                finish();
+            }
+            else{
+                ((EditText) findViewById(R.id.txtnewlist_name)).setText("");
+                ((EditText) findViewById(R.id.txtnewlist_place)).setText("");
+                ((EditText) findViewById(R.id.txtnewlist_day)).setText("");
+                ((EditText) findViewById(R.id.txtnewlist_time)).setText("");
+                Toast.makeText(getApplicationContext(),LIST_NOT_CREATED_TEXT, Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+    public Boolean createlist(String strlistName, String strlistPlace, String strlistDate){
+        ACSClient sdk = new ACSClient(APP_KEY,getApplicationContext()); // app key
+        Map<String, Object> data = new HashMap<String, Object>();
+        Boolean booListCreated = false;
+
+        data.put("fields", "{\"nom\" : \"" + strlistName + "\", \"lloc\": \"" + strlistPlace + "\" , \"data\": \"" + strlistDate + "\"}");
+
+        try {
+            CCResponse response2 = sdk.sendRequest("objects/llista/create.json", CCRequestMethod.POST, data);
+            CCMeta meta2 = response2.getMeta();
+            if("ok".equals(meta2.getStatus())
+                    && meta2.getCode() == 200
+                    && "createObject".equals(meta2.getMethod())) {
+                booListCreated = true;
+            }
+            else{
+                booListCreated = false;
+            }
+        } catch (ACSClientError acsClientError) {
+            acsClientError.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return booListCreated;
     }
 
     public void showDatePickerDialog(View v) {
@@ -65,105 +185,5 @@ public class act_newlist extends FragmentActivity {
     public void showTimePickerDialog(View v) {
         DialogFragment newFragment = new TimePickerFragment(et_Time);
         newFragment.show(getSupportFragmentManager(),"timePicker");
-    }
-    private class CreateListTask extends AsyncTask<Void, Void, Void>
-    {
-        private ProgressDialog dia;
-
-        @Override
-        protected void onPreExecute() {
-            dia = new ProgressDialog(act_newlist.this);
-            dia.setMessage("Creant llista...");
-            dia.show();
-            dia.setCancelable(false);
-        }
-
-        @Override
-        protected Void doInBackground(Void... params)
-        {
-            createlist(listName,listPlace,listDate);
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void result)
-        {
-            if (dia.isShowing()) {
-                dia.dismiss();
-            }
-            if (booResult){
-
-            }
-            else
-            {
-                ((EditText) findViewById(R.id.txtnewlist_name)).setText("");
-                ((EditText) findViewById(R.id.txtnewlist_place)).setText("");
-                ((EditText) findViewById(R.id.txtnewlist_day)).setText("");
-                ((EditText) findViewById(R.id.txtnewlist_time)).setText("");
-                Toast toast1 =
-                        Toast.makeText(getApplicationContext(),
-                                "No s'ha pogut crear la llista", Toast.LENGTH_LONG);
-                toast1.show();
-            }
-        }
-    }
-    public void createlist(String strlistName, String strlistPlace, String strlistDate){
-
-
-        ACSClient sdk = new ACSClient("iGXpZFRj2XCl9Aixrig80d0rrftOzRef",getApplicationContext()); // app key
-        Map<String, Object> data = new HashMap<String, Object>();
-
-        //data.put("fields", "{\"nom\" : \"" + listName + "\", \"lloc\": \"" + listPlace + "\"}");
-        data.put("fields", "{\"nom\" : \"" + strlistName + "\", \"lloc\": \"" + strlistPlace + "\" , \"data\": \"" + strlistDate + "\"}");
-
-        try {
-            CCResponse response2 = sdk.sendRequest("objects/llista/create.json", CCRequestMethod.POST, data);
-            CCMeta meta2 = response2.getMeta();
-            if("ok".equals(meta2.getStatus())
-                    && meta2.getCode() == 200
-                    && "createObject".equals(meta2.getMethod())) {
-                booResult = true;
-            }
-            else{
-                booResult = false;
-            }
-        } catch (ACSClientError acsClientError) {
-            acsClientError.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        /*
-        ACSClient sdk = new ACSClient("iGXpZFRj2XCl9Aixrig80d0rrftOzRef",getApplicationContext());
-        Map<String, Object> dataMap = new HashMap<String, Object>();
-        dataMap.put("login", strLogin);
-        dataMap.put("password", strPass);
-
-        try {
-            CCResponse response;
-            response = sdk.sendRequest("users/login.json", CCRequestMethod.POST, dataMap);
-            CCMeta meta = response.getMeta();
-            if("ok".equals(meta.getStatus())
-                    && meta.getCode() == 200
-                    && "loginUser".equals(meta.getMethod())){
-                try{
-                    JSONObject json = response.getResponseData();
-                    JSONArray users = json.getJSONArray("users");
-                    JSONObject aux = users.getJSONObject(0);
-
-                    user_id = aux.getString("id");
-                }
-                catch (JSONException e){
-                    e.printStackTrace();
-                }
-                booResult = true;
-            }
-            else{
-                booResult = false;
-            }
-        } catch (ACSClientError e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }*/
     }
 }
