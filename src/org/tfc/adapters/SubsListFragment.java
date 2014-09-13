@@ -1,6 +1,5 @@
 package org.tfc.adapters;
 
-
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -26,48 +25,26 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-
 public class SubsListFragment extends Fragment{
     private ListView lv;
     private String user_id;
     private String llista_id;
-    private JSONObject auxJSON;
     private int i;
     private JSONArray llista;
     private LlistaAdapter adapter;
     private List<Llista> llistes;
 
-    public static boolean loadData = true;
+    public final static String APP_KEY = "iGXpZFRj2XCl9Aixrig80d0rrftOzRef";
+    public final static String NOT_CONNECTED_TEXT = "No hi ha connexió de dades. No es pot realitzar l'operació";
+    public final static String PROCESSING_TEXT = "Recuperant dades. Esperi...";
 
+    public static boolean loadData = true;
     private NetworkReceiver receiver = new NetworkReceiver();
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         return inflater.inflate(R.layout.subslist, container, false);
-    }
-
-    @Override
-    public void onResume(){
-        super.onResume();
-
-        // Register BroadcastReceiver to track connection changes.
-        IntentFilter filter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
-        receiver = new NetworkReceiver();
-        getActivity().registerReceiver(receiver, filter);
-
-        if (loadData == true){
-            LoadListTask taskload= new LoadListTask();
-            taskload.execute();
-        }
-    }
-
-    @Override
-    public void onPause(){
-        super.onPause();
-        //if (receiver != null) {
-        getActivity().unregisterReceiver(receiver);
-        //}
     }
 
     @Override
@@ -83,21 +60,42 @@ public class SubsListFragment extends Fragment{
             LoadListTask taskload= new LoadListTask();
             taskload.execute();
         }
+        //else
+            //Toast.makeText(getActivity(),NOT_CONNECTED_TEXT, Toast.LENGTH_LONG).show();
     }
 
+    @Override
+    public void onResume(){
+        super.onResume();
+
+        IntentFilter filter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
+        receiver = new NetworkReceiver();
+        getActivity().registerReceiver(receiver, filter);
+
+        if (loadData == true){
+            LoadListTask taskload= new LoadListTask();
+            taskload.execute();
+        }
+        //else
+        //    Toast.makeText(getActivity(),NOT_CONNECTED_TEXT, Toast.LENGTH_LONG).show();
+    }
+
+    @Override
+    public void onPause(){
+        super.onPause();
+        if (receiver != null) {
+        getActivity().unregisterReceiver(receiver);
+        }
+    }
 
     public class NetworkReceiver extends BroadcastReceiver {
-
         @Override
         public void onReceive(Context context, Intent intent) {
             ConnectivityManager connMgr = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
             NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
 
-            // Check if network connection is available
-            if (networkInfo != null && (networkInfo.getType() == ConnectivityManager.TYPE_MOBILE || networkInfo.getType() == ConnectivityManager.TYPE_WIFI)){
-                //Toast.makeText(context, networkInfo.getType(), Toast.LENGTH_SHORT).show();
+            if (networkInfo != null && networkInfo.isConnected())
                 loadData = true;
-            }
             else
                 loadData = false;
         }
@@ -105,22 +103,15 @@ public class SubsListFragment extends Fragment{
 
     private class LoadListTask extends AsyncTask<Void, Void, Void>
     {
-        //private ProgressDialog dia;
-
         @Override
         protected void onPreExecute() {
             setRetainInstance(true);
-            //dia = new ProgressDialog(getActivity());
-            //dia.setMessage("Recuperant dades. Esperi...");
-            //dia.show();
         }
 
         @Override
         protected Void doInBackground(Void... params)
         {
-            /*-----------RECUPERAR LLISTES-----------------*/
-            // Test ACS
-            ACSClient sdk = new ACSClient("iGXpZFRj2XCl9Aixrig80d0rrftOzRef",getActivity().getApplicationContext()); // app key
+            ACSClient sdk = new ACSClient(APP_KEY,getActivity().getApplicationContext()); // app key
             Map<String, Object> data = new HashMap<String, Object>();
             data.put("where", "{\"id_user\" : \"" + user_id + "\"}");
             data.put("order", "id_user");
@@ -151,10 +142,6 @@ public class SubsListFragment extends Fragment{
         @Override
         protected void onPostExecute(Void result)
         {
-            /*if (dia.isShowing()) {
-                dia.dismiss();
-            } */
-
             llistes = new ArrayList<Llista>();
 
             for (i = 0; i < llista.length(); i++) {
@@ -165,7 +152,6 @@ public class SubsListFragment extends Fragment{
                     String txtlistname = null;
                     txtlistname = aux.getString("nom_llista");
                     String txtlistdate = null;
-                    //txtlistdate = aux.getString("data");
                     txtlistdate = "Test data";
 
                     Llista llista_aux = new Llista(txtidlist,txtlistname,txtlistdate);
@@ -180,7 +166,6 @@ public class SubsListFragment extends Fragment{
 
             lv = (ListView)getView().findViewById(R.id.lvSubs);
             lv.setAdapter(adapter);
-
             lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 public void onItemClick(AdapterView<?> parent, View v,
                                         int position, long id) {

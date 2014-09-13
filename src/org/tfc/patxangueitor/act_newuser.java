@@ -2,6 +2,12 @@ package org.tfc.patxangueitor;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
@@ -25,10 +31,24 @@ public class act_newuser extends Activity {
     private JSONArray users;
     private ArrayAdapter<String> adapter;
 
+    public final static String APP_KEY = "iGXpZFRj2XCl9Aixrig80d0rrftOzRef";
+    public final static String NOT_CONNECTED_TEXT = "No hi ha connexió de dades. No es pot realitzar l'operació";
+    public final static String USER_ADDED_TEXT = "Usuari afegit a la llista";
+    public final static String USER_NOT_ADDED_TEXT = "Hi hagut un error a l'afegir l'usuari. Torna-ho a provar, si us plau";
+    public final static String PROCESSING_TEXT = "Carregant usuaris. Esperi si us plau.";
+    public final static String PROCESSING_TEXT2 = "Afegint usuari a la llista... Esperi si us plau.";
+
+    public static boolean loadData = true;
+    private NetworkReceiver receiver = new NetworkReceiver();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.newuser);
+
+        IntentFilter filter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
+        receiver = new NetworkReceiver();
+        this.registerReceiver(receiver, filter);
 
         users = new JSONArray();
 
@@ -36,9 +56,35 @@ public class act_newuser extends Activity {
         llista_id = b.getString("Llista");
         nom_llista = b.getString("NomLlista");
 
-        LoadAllUsersTask taskloadallusers= new LoadAllUsersTask();
-        taskloadallusers.execute();
+        if (loadData){
+            LoadAllUsersTask taskloadallusers= new LoadAllUsersTask();
+            taskloadallusers.execute();
+        }
+        else
+            Toast.makeText(getApplicationContext(),NOT_CONNECTED_TEXT, Toast.LENGTH_LONG).show();
     }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (receiver != null) {
+            this.unregisterReceiver(receiver);
+        }
+    }
+
+    public class NetworkReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            ConnectivityManager connMgr = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+            NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
+
+            if (networkInfo != null && networkInfo.isConnected())
+                loadData = true;
+            else
+                loadData = false;
+        }
+    }
+
 
     private class LoadAllUsersTask extends AsyncTask<Void, Void, Boolean>
     {
@@ -47,38 +93,14 @@ public class act_newuser extends Activity {
         @Override
         protected void onPreExecute() {
             dia = new ProgressDialog(act_newuser.this);
-            dia.setMessage("Carregant usuaris");
+            dia.setMessage(PROCESSING_TEXT);
             dia.show();
         }
 
         @Override
         protected Boolean doInBackground(Void... params)
         {
-            /*ACSClient sdk = new ACSClient("iGXpZFRj2XCl9Aixrig80d0rrftOzRef",getApplicationContext());
-            CCResponse response = null;
-
-            try {
-                response = sdk.sendRequest("users/search.json", CCRequestMethod.GET, null);
-            } catch (ACSClientError acsClientError) {
-                acsClientError.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            JSONObject responseJSON = response.getResponseData();
-            CCMeta meta = response.getMeta();
-            if("ok".equals(meta.getStatus())
-                    && meta.getCode() == 200
-                    && "searchUsers".equals(meta.getMethod())) {
-                try {
-                    users = responseJSON.getJSONArray("users");
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-            return null;*/
-            return loadallusers();
-
+            return loadAllUsers();
         }
 
         @Override
@@ -108,13 +130,16 @@ public class act_newuser extends Activity {
                                         int position, long id) {
                     try {
                         auxJSON = users.getJSONObject(position);
-                        //llista_id = auxJSON.getString("id");
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
-                    AddUserToListTask taskaddusertolist= new AddUserToListTask();
-                    taskaddusertolist.execute();
 
+                    if (loadData){
+                        AddUserToListTask taskaddusertolist= new AddUserToListTask();
+                        taskaddusertolist.execute();
+                    }
+                    else
+                        Toast.makeText(getApplicationContext(),NOT_CONNECTED_TEXT, Toast.LENGTH_LONG).show();
                 }
             });
         }
@@ -127,38 +152,14 @@ public class act_newuser extends Activity {
         @Override
         protected void onPreExecute() {
             dia = new ProgressDialog(act_newuser.this);
-            dia.setMessage("Afegint usuari a la llista...");
+            dia.setMessage(PROCESSING_TEXT2);
             dia.show();
         }
 
         @Override
         protected Boolean doInBackground(Void... params)
         {
-            /*ACSClient sdk = new ACSClient("iGXpZFRj2XCl9Aixrig80d0rrftOzRef",getApplicationContext());
-            CCResponse response = null;
-
-            try {
-                response = sdk.sendRequest("users/search.json", CCRequestMethod.GET, null);
-            } catch (ACSClientError acsClientError) {
-                acsClientError.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            JSONObject responseJSON = response.getResponseData();
-            CCMeta meta = response.getMeta();
-            if("ok".equals(meta.getStatus())
-                    && meta.getCode() == 200
-                    && "searchUsers".equals(meta.getMethod())) {
-                try {
-                    users = responseJSON.getJSONArray("users");
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-            return null;*/
-            return addusertolist();
-
+            return addUserToList();
         }
 
         @Override
@@ -167,58 +168,46 @@ public class act_newuser extends Activity {
             if (dia.isShowing()) {
                 dia.dismiss();
             }
+
             if (booResult){
-                Toast toast1 =
-                        Toast.makeText(getApplicationContext(),
-                                "Usuari afegit a la llista", Toast.LENGTH_LONG);
-                toast1.show();
+                Toast.makeText(getApplicationContext(),USER_ADDED_TEXT, Toast.LENGTH_LONG).show();
                 finish();
             }
             else
-            {
-                Toast toast2 =
-                        Toast.makeText(getApplicationContext(),
-                                "Hi hagut un error en la creació de l'usuari. Torna-ho a provar, si us plau", Toast.LENGTH_LONG);
-                toast2.show();
-            }
 
+                Toast.makeText(getApplicationContext(),USER_NOT_ADDED_TEXT, Toast.LENGTH_LONG).show();
         }
     }
 
-    public boolean addusertolist(){
-        ACSClient sdk = new ACSClient("iGXpZFRj2XCl9Aixrig80d0rrftOzRef",getApplicationContext());
+    public Boolean addUserToList(){
+        ACSClient sdk = new ACSClient(APP_KEY,getApplicationContext());
         Boolean booStatus = false;
-
-        //HashMap<String, Object> dataMap = new HashMap<String, Object>();
-        //dataMap.put("id_llista", "533df8de891fdf43ba086f5d");
-        //dataMap.put("id_usuari", "oscarino");
-
 
         Map<String, Object> data = new HashMap<String, Object>();
 
-        String txtuserid = null;
+        String txtuserid = "";
         try {
             txtuserid = auxJSON.getString("id");
         } catch (JSONException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            e.printStackTrace();
         }
-        String txtusername = null;
+        String txtusername = "";
         try {
             txtusername = auxJSON.getString("username");
         } catch (JSONException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            e.printStackTrace();
         }
-        String txtfirstname = null;
+        String txtfirstname = "";
         try {
             txtfirstname = auxJSON.getString("first_name");
         } catch (JSONException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            e.printStackTrace();
         }
-        String txtemail = null;
+        String txtemail = "";
         try {
             txtemail = auxJSON.getString("email");
         } catch (JSONException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            e.printStackTrace();
         }
 
         data.put("fields", "{\"id_llista\" : \"" + llista_id + "\", \"nom_llista\": \"" + nom_llista + "\", \"id_user\": \"" + txtuserid + "\", \"username\": \"" + txtusername + "\", \"firstname\": \"" + txtfirstname
@@ -241,11 +230,10 @@ public class act_newuser extends Activity {
         return booStatus;
     }
 
-    public boolean loadallusers(){
-        ACSClient sdk = new ACSClient("iGXpZFRj2XCl9Aixrig80d0rrftOzRef",getApplicationContext());
+    public boolean loadAllUsers(){
+        ACSClient sdk = new ACSClient(APP_KEY,getApplicationContext());
         CCResponse response = null;
-        boolean result;
-        result = false;
+        boolean booResult = false;
 
         try {
             response = sdk.sendRequest("users/search.json", CCRequestMethod.GET, null);
@@ -262,11 +250,11 @@ public class act_newuser extends Activity {
                 && "searchUsers".equals(meta.getMethod())) {
             try {
                 users = responseJSON.getJSONArray("users");
-                result = true;
+                booResult = true;
             } catch (JSONException e) {
                 e.printStackTrace();
             }
         }
-        return result;
+        return booResult;
     }
 }

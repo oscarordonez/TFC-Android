@@ -49,7 +49,6 @@ public class act_newlist extends FragmentActivity {
             public void onClick(View view){
                 listName = ((EditText) findViewById(R.id.txtnewlist_name)).getText().toString();
                 listDate = ((TextView) findViewById(R.id.txtnewlist_date)).getText().toString();
-                //listDate = "testdata";
                 listPlace = ((EditText) findViewById(R.id.txtnewlist_place)).getText().toString();
 
                 CreateListTask taskcreatelist= new CreateListTask();

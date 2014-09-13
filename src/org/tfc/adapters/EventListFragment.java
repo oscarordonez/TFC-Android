@@ -1,7 +1,12 @@
 package org.tfc.adapters;
 
 import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -31,7 +36,13 @@ public class EventListFragment extends Fragment {
     protected Object mActionMode;
     private String strId;
     List<Event> events;
+    public final static String APP_KEY = "iGXpZFRj2XCl9Aixrig80d0rrftOzRef";
+    public final static String NOT_CONNECTED_TEXT = "No hi ha connexió de dades. No es pot realitzar l'operació";
+    public final static String PROCESSING_TEXT = "Recuperant dades. Esperi...";
+    public final static String PROCESSING_TEXT2 = "Esborrant event. Esperi...";
 
+    public static boolean loadData = true;
+    private NetworkReceiver receiver = new NetworkReceiver();
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -59,9 +70,51 @@ public class EventListFragment extends Fragment {
             }
         });
 
-        LoadEventsTask eventload= new LoadEventsTask();
-        eventload.execute();
+        if (loadData){
+            LoadEventsTask eventload= new LoadEventsTask();
+            eventload.execute();
+        }
+        else
+            Toast.makeText(getActivity(), NOT_CONNECTED_TEXT, Toast.LENGTH_LONG).show();
     }
+
+    @Override
+    public void onResume(){
+        super.onResume();
+
+        IntentFilter filter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
+        receiver = new NetworkReceiver();
+        getActivity().registerReceiver(receiver, filter);
+
+        if (loadData){
+            LoadEventsTask eventload= new LoadEventsTask();
+            eventload.execute();
+        }
+        else
+            Toast.makeText(getActivity(),NOT_CONNECTED_TEXT, Toast.LENGTH_LONG).show();
+    }
+
+    @Override
+    public void onPause(){
+        super.onPause();
+        if (receiver != null) {
+            getActivity().unregisterReceiver(receiver);
+        }
+    }
+
+    public class NetworkReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            ConnectivityManager connMgr = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+            NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
+
+            if (networkInfo != null && networkInfo.isConnected())
+                loadData = true;
+            else
+                loadData = false;
+        }
+    }
+
 
     private class LoadEventsTask extends AsyncTask<Void, Void, Void>
     {
@@ -70,14 +123,14 @@ public class EventListFragment extends Fragment {
         @Override
         protected void onPreExecute() {
             dia = new ProgressDialog(getActivity());
-            dia.setMessage("Recuperant dades. Esperi...");
+            dia.setMessage(PROCESSING_TEXT);
             dia.show();
         }
 
         @Override
         protected Void doInBackground(Void... params)
         {
-            ACSClient sdk = new ACSClient("iGXpZFRj2XCl9Aixrig80d0rrftOzRef",getActivity().getApplicationContext());
+            ACSClient sdk = new ACSClient(APP_KEY,getActivity().getApplicationContext());
 
             Map<String, Object> data = new HashMap<String, Object>();
             data.put("where", "{\"id_llista\" : \"" + llista_id + "\"}");
@@ -113,26 +166,17 @@ public class EventListFragment extends Fragment {
                 dia.dismiss();
             }
 
-            /* Test adapter */
-
-            ArrayList<String> values = new ArrayList<String>();
-
-
             events = new ArrayList<Event>();
-
-
             int i;
             for (i = 0; i < llista.length(); i++) {
                 try {
                     JSONObject aux = llista.getJSONObject(i);
-                    /* Test adapter */
                     String txteventid = null;
                     txteventid = aux.getString("id");
                     String txtEventName = null;
                     txtEventName = aux.getString("id_event");
                     String txtEventDate = null;
                     txtEventDate = aux.getString("data");
-                    //String StrACS_idLlista, String StrEventName, String StrEventDate
                     Event event_aux = new Event(txteventid,llista_id,txtEventName,txtEventDate);
                     events.add(event_aux);
                 } catch (JSONException e) {
@@ -140,8 +184,6 @@ public class EventListFragment extends Fragment {
                 }
             }
 
-            /* Test adapter */
-            //adapter = new ArrayAdapter<String>(getActivity(),android.R.layout.simple_list_item_1, values);
             adapter = new EventAdapter(getActivity(),R.layout.user,events);
             adapter.notifyDataSetChanged();
 
@@ -174,38 +216,30 @@ public class EventListFragment extends Fragment {
                     if (mActionMode != null) {
                         return false;
                     }
-                    // Start the CAB using the ActionMode.Callback defined above
-                    //mActionMode = getActivity().startActionMode(mActionModeCallback);
-                    //lv.setSelected(true);
-                    //return true;
-                    //lv.selectedPosition = pos;
                     strId = events.get(pos).getObj_id();
-
-
                     lv.setItemChecked(pos, true);
-
                     mActionMode = getActivity().startActionMode(mActionModeCallback);
                     return true;
                 }
             });
-
         }
     }
 
-    private class DelEventTask extends AsyncTask<Void, Void, Void>{
+    private class DelEventTask extends AsyncTask<Void, Void, Boolean>{
         private ProgressDialog dia;
 
         @Override
         protected void onPreExecute() {
             dia = new ProgressDialog(getActivity());
-            dia.setMessage("Esborrant event. Esperi...");
+            dia.setMessage(PROCESSING_TEXT2);
             dia.show();
         }
 
         @Override
-        protected Void doInBackground(Void... params)
+        protected Boolean doInBackground(Void... params)
         {
-            ACSClient sdk = new ACSClient("iGXpZFRj2XCl9Aixrig80d0rrftOzRef",getActivity().getApplicationContext()); // app key
+            Boolean booStatus = false;
+            ACSClient sdk = new ACSClient(APP_KEY,getActivity().getApplicationContext()); // app key
 
             Map<String, Object> data = new HashMap<String, Object>();
             data.put("id", strId);
@@ -219,18 +253,17 @@ public class EventListFragment extends Fragment {
                 e.printStackTrace();
             }
 
-            JSONObject responseJSON = response.getResponseData();
             CCMeta meta = response.getMeta();
             if("ok".equals(meta.getStatus())
                     && meta.getCode() == 200
                     && "deleteObjects".equals(meta.getMethod())) {
-
+                booStatus = true;
             }
-            return null;
+            return booStatus;
         }
 
         @Override
-        protected void onPostExecute(Void result)
+        protected void onPostExecute(Boolean booStatus)
         {
             if (dia.isShowing()) {
                 dia.dismiss();
@@ -262,18 +295,19 @@ public class EventListFragment extends Fragment {
         public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
             switch (item.getItemId()) {
                 case R.id.action_delete:
-                    //shareCurrentItem();
-                    DelEventTask taskDelEventUser= new DelEventTask();
-                    taskDelEventUser.execute();
-
-                    mode.finish(); // Action picked, so close the CAB
+                    if (loadData){
+                        DelEventTask taskDelEventUser= new DelEventTask();
+                        taskDelEventUser.execute();
+                    }
+                    //else
+                    //    Toast.makeText(getActivity(), NOT_CONNECTED_TEXT, Toast.LENGTH_LONG).show();
+                    mode.finish();
                     return true;
                 default:
                     return false;
             }
         }
 
-        // Called when the user exits the action mode
         @Override
         public void onDestroyActionMode(ActionMode mode) {
             mActionMode = null;

@@ -6,38 +6,47 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.pm.ActivityInfo;
-import android.content.res.Configuration;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
+import android.os.Handler;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.EditText;
 import android.widget.Toast;
+import com.appcelerator.cloud.push.*;
 import com.appcelerator.cloud.sdk.*;
-import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 import org.tfc.adapters.TabsPagerAdapter;
 import android.app.ActionBar;
+
 import android.os.Bundle;
-import org.tfc.patxangueitor.R;
+import org.tfc.functions.PushNotificationsManager;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-
 
 public class mainscreen extends FragmentActivity implements ActionBar.TabListener {
     private ViewPager viewPager;
     private TabsPagerAdapter mAdapter;
     private ActionBar actionBar;
     private String user_id;
-    // Tab titles
+
     private String[] tabs = { "Admin. Llistes", "Subscripcions Llistes" };
+    public final static String APP_KEY = "iGXpZFRj2XCl9Aixrig80d0rrftOzRef";
+    public final static String NOT_CONNECTED_TEXT = "No hi ha connexió de dades. No es pot realitzar l'operació";
+    public final static String SESSION_DISCONNECTED_TEXT = "La sessió s'ha desconnectat";
+    public final static String SESSION_NOT_DISCONNECTED_TEXT = "No desconnectat. Si us plau, torni-ho a provar";
+    public final static String PROCESSING_TEXT = "Desconnectant...";
+
+    public static boolean loadData = true;
+    private NetworkReceiver receiver = new NetworkReceiver();
+
+    public final static String LOG_TAG = mainscreen.class.getName();
+
+    private Handler activityHandler = new Handler();
+    private String mDeviceID;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,11 +54,22 @@ public class mainscreen extends FragmentActivity implements ActionBar.TabListene
 
         setContentView(R.layout.activity_mainscreen);
 
-        //Recuperamos la información pasada en el intent
+        IntentFilter filter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
+        receiver = new NetworkReceiver();
+        this.registerReceiver(receiver, filter);
+
+        if (loadData){
+            GetDeviceIDTask taskgetdeviceid = new GetDeviceIDTask();
+            taskgetdeviceid.execute();
+        }
+        else
+            Toast.makeText(getApplicationContext(),NOT_CONNECTED_TEXT, Toast.LENGTH_LONG).show();
+
+        //Get Intent info
         Bundle bundle = this.getIntent().getExtras();
         user_id = bundle.getString("User");
 
-       // Initilization
+       // Initilization viewpager
         viewPager = (ViewPager) findViewById(R.id.pager);
         actionBar = getActionBar();
         mAdapter = new TabsPagerAdapter(getSupportFragmentManager());
@@ -62,12 +82,11 @@ public class mainscreen extends FragmentActivity implements ActionBar.TabListene
             actionBar.addTab(actionBar.newTab().setText(tab_name)
                     .setTabListener(this));
         }
-            viewPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+
+        viewPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
 
                 @Override
                 public void onPageSelected(int position) {
-                    // on changing the page
-                    // make respected tab selected
                     actionBar.setSelectedNavigationItem(position);
                 }
 
@@ -81,10 +100,16 @@ public class mainscreen extends FragmentActivity implements ActionBar.TabListene
             });
     }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (receiver != null) {
+            this.unregisterReceiver(receiver);
+        }
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu items for use in the action bar
         getMenuInflater().inflate(R.menu.menu_mainscreen, menu);
         return super.onCreateOptionsMenu(menu);
     }
@@ -107,13 +132,30 @@ public class mainscreen extends FragmentActivity implements ActionBar.TabListene
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_logout:
-                LogOutTask tasklogout= new LogOutTask();
-                tasklogout.execute();
+                if (loadData){
+                    LogOutTask tasklogout= new LogOutTask();
+                    tasklogout.execute();
+                }
+                else
+                    Toast.makeText(getApplicationContext(),NOT_CONNECTED_TEXT, Toast.LENGTH_LONG).show();
                 return true;
         }
         return true;
     }
 
+    public class NetworkReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            ConnectivityManager connMgr = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+            NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
+
+            if (networkInfo != null && networkInfo.isConnected()){
+                loadData = true;
+            }
+            else
+                loadData = false;
+        }
+    }
 
     private class LogOutTask extends AsyncTask<Void, Void, Boolean>
     {
@@ -121,9 +163,8 @@ public class mainscreen extends FragmentActivity implements ActionBar.TabListene
 
         @Override
         protected void onPreExecute() {
-            lockScreenOrientation();
             dia = new ProgressDialog(mainscreen.this);
-            dia.setMessage("Desconnectant...");
+            dia.setMessage(PROCESSING_TEXT);
             dia.show();
             dia.setCancelable(false);
         }
@@ -131,36 +172,27 @@ public class mainscreen extends FragmentActivity implements ActionBar.TabListene
         @Override
         protected Boolean doInBackground(Void... params)
         {
-            return performlogout();
+            return performLogout();
         }
 
         @Override
         protected void onPostExecute(Boolean booResult)
         {
-            Toast toast_logout;
             if (dia.isShowing()) {
                 dia.dismiss();
             }
-            unlockScreenOrientation();
             if (booResult){
-                //toast_logout = Toast.makeText(getApplicationContext(),
-                //        "La sessió s'ha desconnectat", Toast.LENGTH_LONG);
-                //toast_logout.show();
+                Toast.makeText(getApplicationContext(),SESSION_DISCONNECTED_TEXT, Toast.LENGTH_LONG).show();
                 finish();
             }
             else
-            {
-                toast_logout = Toast.makeText(getApplicationContext(),
-                        "No desconnectat. Si us plau, torni-ho a provar", Toast.LENGTH_LONG);
-                toast_logout.show();
-            }
+                Toast.makeText(getApplicationContext(),SESSION_NOT_DISCONNECTED_TEXT, Toast.LENGTH_LONG).show();
         }
     }
 
-    public boolean performlogout(){
-        ACSClient sdk = new ACSClient("iGXpZFRj2XCl9Aixrig80d0rrftOzRef",getApplicationContext());
-        Boolean result;
-        result = false;
+    public Boolean performLogout(){
+        ACSClient sdk = new ACSClient(APP_KEY,getApplicationContext());
+        Boolean booResult = false;
 
         try {
             CCResponse response;
@@ -169,26 +201,105 @@ public class mainscreen extends FragmentActivity implements ActionBar.TabListene
             if("ok".equals(meta.getStatus())
                     && meta.getCode() == 200
                     && "logoutUser".equals(meta.getMethod())){
-                result = true;
+                booResult = true;
             }
         }catch (ACSClientError e) {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return result;
+        return booResult;
     }
 
-    private void lockScreenOrientation() {
-        int currentOrientation = getResources().getConfiguration().orientation;
-        if (currentOrientation == Configuration.ORIENTATION_PORTRAIT) {
-            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-        } else {
-            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+    private class UnSubscribeTask extends AsyncTask<Void, Void, Void>
+    {
+        @Override
+        protected Void doInBackground(Void... params)
+        {
+            ACSClient sdk = new ACSClient(APP_KEY,getApplicationContext());
+            try {
+                PushNotificationsManager.unsubscribePushNotifications(sdk, mDeviceID, "event");
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (ACSClientError acsClientError) {
+                acsClientError.printStackTrace();
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            return null;
         }
     }
 
-    private void unlockScreenOrientation() {
-        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR);
+    private class GetDeviceIDTask extends AsyncTask<Void, Void, Void>
+    {
+        @Override
+        protected Void doInBackground(Void... params)
+        {
+
+            PushType pushType = CCPushService.getInstance().getPushType(getApplicationContext());
+            try {
+                CCPushService.getInstance().getGCMSenderIdAsnyc(getApplicationContext(), APP_KEY, new GCMSenderIdCallback() {
+                    public void receivedGCMSenderId(String senderId) {
+                        Log.i(LOG_TAG, "Got SenderId: " + senderId);
+                        CCPushService.getInstance().registerGCM(getApplicationContext(), senderId, APP_KEY, new DeviceTokenCallback() {
+                            public void receivedDeviceToken(final String deviceToken) {
+                                if (deviceToken == null || deviceToken.length() == 0) {
+                                    Log.e(LOG_TAG, "GCM server refused request. Have you configured this app for ACS?");
+                                } else {
+                                    activityHandler.post(new Runnable() {
+                                        public void run() {
+                                            mDeviceID = deviceToken;
+                                        }
+                                    });
+                                }
+                            }
+
+                            public void failedReceiveDeviceToken(Throwable ex) {
+                                Log.e(LOG_TAG, ex.getMessage());
+                            }
+                        });
+                    }
+
+                    public void failedReceiveGCMSenderId(Throwable ex) {
+                        Log.e(LOG_TAG, ex.getMessage());
+                    }
+                });
+            } catch (PushServiceException ex) {
+                Log.e(LOG_TAG, ex.getMessage());
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void result)
+        {
+            if (loadData){
+                SubscribeTask tasksubscribe= new SubscribeTask();
+                tasksubscribe.execute();
+            }
+            else
+                Toast.makeText(getApplicationContext(),NOT_CONNECTED_TEXT, Toast.LENGTH_LONG).show();
+            //SubscribeTask tasksubscribe= new SubscribeTask();
+            //tasksubscribe.execute();
+        }
+    }
+
+    private class SubscribeTask extends AsyncTask<Void, Void, Void>
+    {
+        @Override
+        protected Void doInBackground(Void... params)
+        {
+            ACSClient sdk = new ACSClient(APP_KEY,getApplicationContext());
+            try {
+                PushNotificationsManager.subscribePushNotifications(sdk, mDeviceID, "event");
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (ACSClientError acsClientError) {
+                acsClientError.printStackTrace();
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
     }
  }

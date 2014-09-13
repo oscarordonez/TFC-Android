@@ -5,9 +5,4 @@
           android:orderInCategory="9999"
           android:title="Sortir"
             />
-
-        <item android:id="@+id/action_test"
-              android:showAsAction="never"
-              android:orderInCategory="10"
-              android:title="Info" />
 </menu>

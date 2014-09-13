@@ -35,43 +35,22 @@ public class AdminListFragment extends Fragment {
     private String user_id;
     private String llista_id;
     private String nom_llista;
-    private JSONObject auxJSON;
     private int i;
     private JSONArray llista;
     private LlistaAdapter adapter;
     private List<Llista> llistes;
 
-    public static boolean loadData = true;
+    public final static String APP_KEY = "iGXpZFRj2XCl9Aixrig80d0rrftOzRef";
+    public final static String NOT_CONNECTED_TEXT = "No hi ha connexió de dades. No es pot realitzar l'operació";
+    public final static String PROCESSING_TEXT = "Recuperant dades. Esperi...";
 
+    public static boolean loadData = true;
     private NetworkReceiver receiver = new NetworkReceiver();
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         return inflater.inflate(R.layout.adminlist, container, false);
-    }
-
-    @Override
-    public void onResume(){
-        super.onResume();
-
-        // Register BroadcastReceiver to track connection changes.
-        IntentFilter filter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
-        receiver = new NetworkReceiver();
-        getActivity().registerReceiver(receiver, filter);
-
-        if (loadData == true){
-            LoadListTask taskload= new LoadListTask();
-            taskload.execute();
-        }
-    }
-
-    @Override
-    public void onPause(){
-        super.onPause();
-        //if (receiver != null) {
-            getActivity().unregisterReceiver(receiver);
-        //}
     }
 
     @Override
@@ -84,7 +63,6 @@ public class AdminListFragment extends Fragment {
         user_id = bundle.getString("User");
 
         tv_newlist = (TextView)getView().findViewById(R.id.id_NewList);
-        //tv_newlist.setText("+ Llista");
         tv_newlist.setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {
                 Intent intent_NewList = new Intent(getActivity().getApplicationContext(), act_newlist.class);
@@ -92,51 +70,67 @@ public class AdminListFragment extends Fragment {
             }
         });
 
-        if (loadData == true){
+        if (loadData){
             LoadListTask taskload= new LoadListTask();
             taskload.execute();
         }
+        //else
+        //    Toast.makeText(getActivity(),NOT_CONNECTED_TEXT, Toast.LENGTH_LONG).show();
     }
 
+    @Override
+    public void onResume(){
+        super.onResume();
+
+        IntentFilter filter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
+        receiver = new NetworkReceiver();
+        getActivity().registerReceiver(receiver, filter);
+
+        if (loadData){
+            LoadListTask taskload= new LoadListTask();
+            taskload.execute();
+        }
+        //else
+        //    Toast.makeText(getActivity(),NOT_CONNECTED_TEXT, Toast.LENGTH_LONG).show();
+    }
+
+    @Override
+    public void onPause(){
+        super.onPause();
+        if (receiver != null) {
+            getActivity().unregisterReceiver(receiver);
+        }
+    }
 
     public class NetworkReceiver extends BroadcastReceiver {
-
         @Override
         public void onReceive(Context context, Intent intent) {
             ConnectivityManager connMgr = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
             NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
 
-            // Check if network connection is available
-            if (networkInfo != null && (networkInfo.getType() == ConnectivityManager.TYPE_MOBILE || networkInfo.getType() == ConnectivityManager.TYPE_WIFI)){
-
+            if (networkInfo != null && networkInfo.isConnected())
                 loadData = true;
-            }
-            else{
+            else
                 loadData = false;
-                Toast.makeText(context, "Desconnexió", Toast.LENGTH_SHORT).show();
-            }
         }
     }
 
     private class LoadListTask extends AsyncTask<Void, Void, Void>
     {
         private ProgressDialog dia;
-        private ProgressDialog dia1;
 
         @Override
         protected void onPreExecute() {
             setRetainInstance(true);
             dia = new ProgressDialog(getActivity());
-            dia.setMessage("Recuperant dades. Esperi...");
+            dia.setMessage(PROCESSING_TEXT);
             dia.show();
         }
 
         @Override
         protected Void doInBackground(Void... params)
         {
-            /*-----------RECUPERAR LLISTES-----------------*/
-            // Test ACS
-            ACSClient sdk = new ACSClient("iGXpZFRj2XCl9Aixrig80d0rrftOzRef",getActivity().getApplicationContext()); // app key
+            ACSClient sdk = new ACSClient(APP_KEY,getActivity().getApplicationContext()); // app key
             Map<String, Object> data = new HashMap<String, Object>();
             data.put("where", "{\"user_id\" : \"" + user_id + "\"}");
             data.put("order", "nom");
@@ -161,30 +155,24 @@ public class AdminListFragment extends Fragment {
                     e.printStackTrace();
                 }
             }
-            /*--------------------*/
             return null;
         }
 
         @Override
         protected void onPostExecute(Void result)
         {
-
-            if (dia.isShowing()) {
+            if (dia.isShowing())
                 dia.dismiss();
-            }
-
-            //ArrayList<String> values = new ArrayList<String>();
 
             llistes = new ArrayList<Llista>();
-
             for (i = 0; i < llista.length(); i++) {
                 try {
                     JSONObject aux = llista.getJSONObject(i);
-                    String txtidlist = "";
+                    String txtidlist = null;
                     txtidlist = aux.getString("id");
-                    String txtlistname = "";
+                    String txtlistname = null;
                     txtlistname = aux.getString("nom");
-                    String txtlistdate = "";
+                    String txtlistdate = null;
                     txtlistdate = aux.getString("data");
 
                     Llista llista_aux = new Llista(txtidlist,txtlistname,txtlistdate);
@@ -194,7 +182,6 @@ public class AdminListFragment extends Fragment {
                 }
             }
 
-            //adapter = new ArrayAdapter<String>(getActivity(),android.R.layout.simple_list_item_1, values);
             adapter = new LlistaAdapter(getActivity(),R.layout.llista,llistes);
             adapter.notifyDataSetChanged();
 
