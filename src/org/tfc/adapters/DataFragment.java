@@ -35,7 +35,7 @@ public class DataFragment extends Fragment {
     public final static String NO_DATA_TEXT = "No s'han pogut recuperar dades event";
 
     public static boolean loadData = true;
-    private NetworkReceiver receiver = new NetworkReceiver();
+    private NetworkReceiver receiver2 = new NetworkReceiver();
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -70,8 +70,8 @@ public class DataFragment extends Fragment {
         super.onResume();
 
         IntentFilter filter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
-        receiver = new NetworkReceiver();
-        getActivity().registerReceiver(receiver, filter);
+        receiver2 = new NetworkReceiver();
+        getActivity().registerReceiver(receiver2, filter);
 
         if (checkConnection())
             loadData = true;
@@ -89,8 +89,8 @@ public class DataFragment extends Fragment {
     @Override
     public void onPause(){
         super.onPause();
-        if (receiver != null) {
-            getActivity().unregisterReceiver(receiver);
+        if (receiver2 != null) {
+            getActivity().unregisterReceiver(receiver2);
         }
     }
 

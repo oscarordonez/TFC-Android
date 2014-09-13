@@ -1,7 +1,12 @@
 package org.tfc.adapters;
 
 import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -10,15 +15,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
-import android.widget.TextView;
+import android.widget.Toast;
 import com.appcelerator.cloud.sdk.*;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.tfc.classes.Event;
 import org.tfc.patxangueitor.R;
-import org.tfc.patxangueitor.act_newevent;
-import org.tfc.patxangueitor.adminlistevent;
 import org.tfc.patxangueitor.subslistevent;
 
 import java.io.IOException;
@@ -34,6 +37,13 @@ public class EventSubsListFragment extends Fragment {
     private JSONArray llista;
     private EventAdapter adapter;
 
+    public final static String APP_KEY = "iGXpZFRj2XCl9Aixrig80d0rrftOzRef";
+    public final static String NOT_CONNECTED_TEXT = "No hi ha connexió de dades. No es pot realitzar l'operació";
+    public final static String PROCESSING_TEXT = "Recuperant dades. Esperi...";
+
+    public static boolean loadData = true;
+    private NetworkReceiver receiver = new NetworkReceiver();
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -48,8 +58,72 @@ public class EventSubsListFragment extends Fragment {
         llista_id = bundle.getString("Llista");
         llista = new JSONArray();
 
-        LoadEventsTask eventload= new LoadEventsTask();
-        eventload.execute();
+        if (checkConnection())
+            loadData = true;
+        else
+            loadData = false;
+
+        if (loadData){
+            LoadEventsTask eventload= new LoadEventsTask();
+            eventload.execute();
+        }
+        else
+            Toast.makeText(getActivity(), NOT_CONNECTED_TEXT, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onResume(){
+        super.onResume();
+
+        IntentFilter filter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
+        receiver = new NetworkReceiver();
+        getActivity().registerReceiver(receiver, filter);
+
+        if (checkConnection())
+            loadData = true;
+        else
+            loadData = false;
+
+        if (loadData){
+            LoadEventsTask eventload= new LoadEventsTask();
+            eventload.execute();
+        }
+        else
+            Toast.makeText(getActivity(),NOT_CONNECTED_TEXT, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onPause(){
+        super.onPause();
+        if (receiver != null) {
+            getActivity().unregisterReceiver(receiver);
+        }
+    }
+
+    public class NetworkReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            ConnectivityManager connMgr = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+            NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
+
+            if (networkInfo != null && networkInfo.isConnected())
+                loadData = true;
+            else
+                loadData = false;
+        }
+    }
+
+    private Boolean checkConnection(){
+        Boolean booLoad;
+        ConnectivityManager connMgr = (ConnectivityManager) getActivity().getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
+
+        if (networkInfo != null && networkInfo.isConnected())
+            booLoad = true;
+        else
+            booLoad = false;
+
+        return booLoad;
     }
 
     private class LoadEventsTask extends AsyncTask<Void, Void, Void>
@@ -59,14 +133,14 @@ public class EventSubsListFragment extends Fragment {
         @Override
         protected void onPreExecute() {
             dia = new ProgressDialog(getActivity());
-            dia.setMessage("Recuperant dades. Esperi...");
+            dia.setMessage(PROCESSING_TEXT);
             dia.show();
         }
 
         @Override
         protected Void doInBackground(Void... params)
         {
-            ACSClient sdk = new ACSClient("iGXpZFRj2XCl9Aixrig80d0rrftOzRef",getActivity().getApplicationContext());
+            ACSClient sdk = new ACSClient(APP_KEY,getActivity().getApplicationContext());
 
             Map<String, Object> data = new HashMap<String, Object>();
             data.put("where", "{\"id_llista\" : \"" + llista_id + "\"}");
@@ -98,9 +172,8 @@ public class EventSubsListFragment extends Fragment {
         @Override
         protected void onPostExecute(Void result)
         {
-            if (dia.isShowing()) {
+            if (dia.isShowing())
                 dia.dismiss();
-            }
 
             List<Event> events;
             events = new ArrayList<Event>();

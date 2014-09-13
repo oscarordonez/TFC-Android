@@ -6,7 +6,6 @@ import android.app.FragmentTransaction;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
-import android.view.Menu;
 import org.tfc.adapters.TabsPagerAdapter4;
 
 public class subslistuser extends FragmentActivity implements ActionBar.TabListener {
@@ -53,13 +52,6 @@ public class subslistuser extends FragmentActivity implements ActionBar.TabListe
             public void onPageScrollStateChanged(int arg0) {
             }
         });
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu items for use in the action bar
-        getMenuInflater().inflate(R.menu.menu_mainscreen, menu);
-        return super.onCreateOptionsMenu(menu);
     }
 
     @Override

@@ -1,22 +1,25 @@
 package org.tfc.adapters;
 
 import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ListView;
-import android.widget.TextView;
+import android.widget.*;
 import com.appcelerator.cloud.sdk.*;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.tfc.classes.User;
 import org.tfc.patxangueitor.R;
-import org.tfc.patxangueitor.act_neweventuser;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -30,6 +33,14 @@ public class SubsEventUserListFragment extends Fragment {
     private String event_id;
     private JSONArray llista;
     private UserAdapter adapter;
+    private List<User> users;
+
+    public final static String APP_KEY = "iGXpZFRj2XCl9Aixrig80d0rrftOzRef";
+    public final static String NOT_CONNECTED_TEXT = "No hi ha connexió de dades. No es pot realitzar l'operació";
+    public final static String PROCESSING_TEXT = "Recuperant dades. Esperi...";
+
+    public static boolean loadData = true;
+    private NetworkReceiver receiver = new NetworkReceiver();
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -46,8 +57,72 @@ public class SubsEventUserListFragment extends Fragment {
         event_id = bundle.getString("Event");
         llista = new JSONArray();
 
-        LoadEventUsersTask taskloadeventusers= new LoadEventUsersTask();
-        taskloadeventusers.execute();
+        if (checkConnection())
+            loadData = true;
+        else
+            loadData = false;
+
+        if (loadData){
+            LoadEventUsersTask taskloadeventusers= new LoadEventUsersTask();
+            taskloadeventusers.execute();
+        }
+        else
+            Toast.makeText(getActivity(), NOT_CONNECTED_TEXT, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onResume(){
+        super.onResume();
+
+        IntentFilter filter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
+        receiver = new NetworkReceiver();
+        getActivity().registerReceiver(receiver, filter);
+
+        if (checkConnection())
+            loadData = true;
+        else
+            loadData = false;
+
+        if (loadData){
+            LoadEventUsersTask taskloadeventusers= new LoadEventUsersTask();
+            taskloadeventusers.execute();
+        }
+        else
+            Toast.makeText(getActivity(),NOT_CONNECTED_TEXT, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onPause(){
+        super.onPause();
+        if (receiver != null) {
+            getActivity().unregisterReceiver(receiver);
+        }
+    }
+
+    public class NetworkReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            ConnectivityManager connMgr = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+            NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
+
+            if (networkInfo != null && networkInfo.isConnected())
+                loadData = true;
+            else
+                loadData = false;
+        }
+    }
+
+    private Boolean checkConnection(){
+        Boolean booLoad;
+        ConnectivityManager connMgr = (ConnectivityManager) getActivity().getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
+
+        if (networkInfo != null && networkInfo.isConnected())
+            booLoad = true;
+        else
+            booLoad = false;
+
+        return booLoad;
     }
 
     private class LoadEventUsersTask extends AsyncTask<Void, Void, Void>{
@@ -56,18 +131,18 @@ public class SubsEventUserListFragment extends Fragment {
         @Override
         protected void onPreExecute() {
             dia = new ProgressDialog(getActivity());
-            dia.setMessage("Recuperant usuaris event. Esperi...");
+            dia.setMessage(PROCESSING_TEXT);
             dia.show();
         }
 
         @Override
         protected Void doInBackground(Void... params)
         {
-            ACSClient sdk = new ACSClient("iGXpZFRj2XCl9Aixrig80d0rrftOzRef",getActivity().getApplicationContext()); // app key
+            ACSClient sdk = new ACSClient(APP_KEY,getActivity().getApplicationContext()); // app key
 
             Map<String, Object> data = new HashMap<String, Object>();
-            data.put("where", "{\"id\" : \"" + event_id + "\"}");
-            data.put("order", "id_usuari");
+            data.put("where", "{\"id_event\" : \"" + event_id + "\"}");
+            data.put("order", "id_user");
 
             CCResponse response = null;
             try {
@@ -84,7 +159,7 @@ public class SubsEventUserListFragment extends Fragment {
                     && meta.getCode() == 200
                     && "queryCustomObjects".equals(meta.getMethod())) {
                 try {
-                    llista = responseJSON.getJSONArray("subscripcio_usuari_event");
+                    llista = responseJSON.getJSONArray("subscripcio_event");
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -95,22 +170,15 @@ public class SubsEventUserListFragment extends Fragment {
         @Override
         protected void onPostExecute(Void result)
         {
-            if (dia.isShowing()) {
+            if (dia.isShowing())
                 dia.dismiss();
-            }
 
-            /* Test adapter */
-            //ArrayList<String> values = new ArrayList<String>();
-            List<User> users;
             users = new ArrayList<User>();
-
             int i;
+
             for (i = 0; i < llista.length(); i++) {
                 try {
                     JSONObject aux = llista.getJSONObject(i);
-                    /* Test adapter*/
-                    //values.add(i, aux.getString("id_usuari"));
-                    //JSONObject userdata = aux.getJSONObject("user");
                     //String StrACS_id, String StrUser, String StrFirstName, String StrEmail
                     String txtidobj = null;
                     txtidobj = aux.getString("id");
@@ -130,8 +198,6 @@ public class SubsEventUserListFragment extends Fragment {
                 }
             }
 
-            /* Test adapter */
-            //adapter = new ArrayAdapter<String>(getActivity(),android.R.layout.simple_list_item_1, values);
             adapter = new UserAdapter(getActivity(),R.layout.user, users);
             adapter.notifyDataSetChanged();
 

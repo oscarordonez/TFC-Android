@@ -21,14 +21,12 @@ public class subslistevent extends FragmentActivity implements ActionBar.TabList
         setContentView(R.layout.activity_mainscreen);
 
         // Initilization
-
         viewPager = (ViewPager) findViewById(R.id.pager);
         actionBar = getActionBar();
         mAdapter = new TabsPagerAdapter5(getSupportFragmentManager());
         viewPager.setAdapter(mAdapter);
         actionBar.setHomeButtonEnabled(false);
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
-
 
         // Adding Tabs
         for (String tab_name : tabs) {
@@ -54,13 +52,6 @@ public class subslistevent extends FragmentActivity implements ActionBar.TabList
             }
         });
     }
-
- /*   @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu items for use in the action bar
-        getMenuInflater().inflate(R.menu.menu_mainscreen, menu);
-        return super.onCreateOptionsMenu(menu);
-    }*/
 
     @Override
     public void onTabReselected(ActionBar.Tab tab, FragmentTransaction ft) {
