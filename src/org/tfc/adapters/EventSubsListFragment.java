@@ -220,6 +220,7 @@ public class EventSubsListFragment extends Fragment {
                     Intent intent_Event = new Intent(getActivity().getApplicationContext(), subslistevent.class);
                     Bundle b = new Bundle();
                     b.putString("Llista", llista_id);
+                    b.putString("Lloc", llista_lloc);
                     b.putString("Event", event_id);
                     b.putString("Usuari", user_id);
                     intent_Event.putExtras(b);

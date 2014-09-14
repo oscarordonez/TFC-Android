@@ -209,7 +209,7 @@ public class subslistevent extends FragmentActivity implements ActionBar.TabList
         @Override
         protected void onPostExecute(Boolean booResult)
         {
-            if (booResult) {
+            if (booConv) {
                 Toast.makeText(getApplicationContext(),ACCEPT_CONV_TEXT, Toast.LENGTH_LONG).show();
             }
             else
@@ -226,7 +226,7 @@ public class subslistevent extends FragmentActivity implements ActionBar.TabList
         //        + "\", \"email\": \"" + txtemail + "\" , \"titular\": \"" + false + "\", \"convocat\": \"" + false + "\"}");
 
         data.put("id",subs_id);
-        data.put("fields","{\"convocat\" : \"" + true + "\"}");
+        data.put("fields","{\"convocat\" : \"" + booConv + "\"}");
         try {
             CCResponse response = sdk.sendRequest("objects/subscripcio_event/update.json", CCRequestMethod.PUT, data);
             CCMeta meta = response.getMeta();

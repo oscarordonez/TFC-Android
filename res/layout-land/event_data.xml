@@ -7,7 +7,6 @@
     <TextView
             android:layout_width="150dp"
             android:layout_height="wrap_content"
-            android:text="Nom Event"
             android:id="@+id/txt_eventname"
             style="@android:style/TextAppearance.DeviceDefault.Medium"
             android:layout_alignParentLeft="true"
@@ -16,7 +15,6 @@
     <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Data: ..."
             android:id="@+id/txt_eventadate"
             style="@android:style/TextAppearance.DeviceDefault.Small"
             android:layout_toRightOf="@+id/txt_eventname"
@@ -27,7 +25,6 @@
     <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Lloc: ..."
             android:id="@+id/txt_eventPlace"
             style="@android:style/TextAppearance.DeviceDefault.Small"
             android:layout_alignLeft="@+id/txt_eventname"
