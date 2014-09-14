@@ -197,7 +197,9 @@ public class SubsListFragment extends Fragment{
                     Intent myIntent = new Intent(getActivity().getApplicationContext(), subslistuser.class);
                     Bundle b = new Bundle();
                     b.putString("Llista", llista_id);
+                    b.putString("Usuari", user_id);
                     b.putString("LlocLlista", lloc_llista);
+
                     myIntent.putExtras(b);
                     startActivity(myIntent);
                 }

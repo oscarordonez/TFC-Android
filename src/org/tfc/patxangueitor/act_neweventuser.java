@@ -216,7 +216,7 @@ public class act_neweventuser extends Activity {
 
         String txtuserid = null;
         try {
-            txtuserid = auxJSON.getString("id");
+            txtuserid = auxJSON.getString("id_user");
         } catch (JSONException e) {
             e.printStackTrace();
         }

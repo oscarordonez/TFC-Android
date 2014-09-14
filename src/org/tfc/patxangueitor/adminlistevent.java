@@ -90,8 +90,12 @@ public class adminlistevent extends FragmentActivity implements ActionBar.TabLis
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.send_conv:
-                SendPushTask sendMessage= new SendPushTask();
-                sendMessage.execute();
+                if (loadData){
+                    SendPushTask sendMessage= new SendPushTask();
+                    sendMessage.execute();
+                }
+                else
+                    Toast.makeText(getApplicationContext(),NOT_CONNECTED_TEXT, Toast.LENGTH_LONG).show();
                 return true;
         }
         return true;
