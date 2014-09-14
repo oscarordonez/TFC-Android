@@ -195,10 +195,10 @@ public class AdminListFragment extends Fragment {
                     txtidlist = aux.getString("id");
                     String txtlistname = null;
                     txtlistname = aux.getString("nom");
-                    String txtlistdate = null;
-                    txtlistdate = aux.getString("data");
+                    String txtlistplace = null;
+                    txtlistplace = aux.getString("lloc");
 
-                    Llista llista_aux = new Llista(txtidlist,txtlistname,txtlistdate);
+                    Llista llista_aux = new Llista(txtidlist,txtlistname,txtlistplace);
                     llistes.add(llista_aux);
                 } catch (JSONException e) {
                     e.printStackTrace();

@@ -29,12 +29,14 @@ public class act_newlist extends FragmentActivity {
     String listName;
     String listPlace;
     String listDate;
+    String listTime;
 
     public final static String APP_KEY = "iGXpZFRj2XCl9Aixrig80d0rrftOzRef";
     public final static String NOT_CONNECTED_TEXT = "No hi ha connexió de dades. No es pot realitzar l'operació";
     public final static String PROCESSING_TEXT = "Creant llista. Esperi si us plau.";
     public final static String LIST_CREATED_TEXT = "S'ha creat una nova llista";
     public final static String LIST_NOT_CREATED_TEXT = "No s'ha pogut crear la llista. Torna-ho a provar, si us plau";
+    public final static String FILL_FIELDS_TEXT = "És necessari omplir tots els camps";
 
     public static boolean loadData = true;
     private NetworkReceiver receiver = new NetworkReceiver();
@@ -61,8 +63,9 @@ public class act_newlist extends FragmentActivity {
         createlistbtn.setOnClickListener(new View.OnClickListener(){
             public void onClick(View view){
                 listName = ((EditText) findViewById(R.id.txtnewlist_name)).getText().toString();
-                listDate = ((TextView) findViewById(R.id.txtnewlist_date)).getText().toString();
                 listPlace = ((EditText) findViewById(R.id.txtnewlist_place)).getText().toString();
+                listTime = ((TextView) findViewById(R.id.txtnewlist_time)).getText().toString();
+                listDate = ((TextView) findViewById(R.id.txtnewlist_date)).getText().toString();
 
                 if (checkConnection())
                     loadData = true;
@@ -70,8 +73,12 @@ public class act_newlist extends FragmentActivity {
                     loadData = false;
 
                 if (loadData){
-                    CreateListTask taskcreatelist= new CreateListTask();
-                    taskcreatelist.execute();
+                    if (checkFields()){
+                        CreateListTask taskcreatelist= new CreateListTask();
+                        taskcreatelist.execute();
+                    }
+                    else
+                        Toast.makeText(getApplicationContext(),FILL_FIELDS_TEXT, Toast.LENGTH_SHORT).show();
                 }
                 else
                     Toast.makeText(getApplicationContext(),NOT_CONNECTED_TEXT, Toast.LENGTH_SHORT).show();
@@ -128,7 +135,7 @@ public class act_newlist extends FragmentActivity {
         @Override
         protected Boolean doInBackground(Void... params)
         {
-            return createlist(listName,listPlace,listDate);
+            return createlist(listName,listPlace,listDate,listTime);
         }
 
         @Override
@@ -144,20 +151,20 @@ public class act_newlist extends FragmentActivity {
             else{
                 ((EditText) findViewById(R.id.txtnewlist_name)).setText("");
                 ((EditText) findViewById(R.id.txtnewlist_place)).setText("");
-                ((EditText) findViewById(R.id.txtnewlist_day)).setText("");
-                ((EditText) findViewById(R.id.txtnewlist_time)).setText("");
+                ((TextView) findViewById(R.id.txtnewlist_date)).setText("");
+                ((TextView) findViewById(R.id.txtnewlist_time)).setText("");
                 Toast.makeText(getApplicationContext(),LIST_NOT_CREATED_TEXT, Toast.LENGTH_SHORT).show();
             }
         }
     }
 
-    public Boolean createlist(String strlistName, String strlistPlace, String strlistDate){
+    public Boolean createlist(String strlistName, String strlistPlace, String strlistDate, String strlistTime){
         ACSClient sdk = new ACSClient(APP_KEY,getApplicationContext()); // app key
         Map<String, Object> data = new HashMap<String, Object>();
         Boolean booListCreated = false;
 
-        data.put("fields", "{\"nom\" : \"" + strlistName + "\", \"lloc\": \"" + strlistPlace + "\" , \"data\": \"" + strlistDate + "\"}");
-
+        //data.put("fields", "{\"nom\" : \"" + strlistName + "\", \"lloc\": \"" + strlistPlace + "\" , \"data\": \"" + strlistDate + "\"}");
+        data.put("fields", "{\"nom\" : \"" + strlistName + "\", \"lloc\": \"" + strlistPlace + "\" , \"data\": \"" + strlistDate + "\" , \"hora\": \"" + strlistTime + "\"}");
         try {
             CCResponse response2 = sdk.sendRequest("objects/llista/create.json", CCRequestMethod.POST, data);
             CCMeta meta2 = response2.getMeta();
@@ -185,5 +192,12 @@ public class act_newlist extends FragmentActivity {
     public void showTimePickerDialog(View v) {
         DialogFragment newFragment = new TimePickerFragment(et_Time);
         newFragment.show(getSupportFragmentManager(),"timePicker");
+    }
+
+    private Boolean checkFields(){
+        if (listName.equals("") || listPlace.equals("") || listDate.equals("") || listTime.equals(""))
+            return false;
+        else
+            return true;
     }
 }

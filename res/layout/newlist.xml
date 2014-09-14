@@ -35,7 +35,8 @@
             android:id="@+id/txtnewlist_name"
             android:layout_alignBottom="@+id/tv_NewListName"
             android:layout_toRightOf="@+id/tv_NewListName"
-            android:layout_alignParentRight="true"/>
+            android:layout_alignParentRight="true"
+            android:hint="Nom de la llista"/>
 
     <TextView
             android:layout_width="120dp"
@@ -55,7 +56,8 @@
             android:id="@+id/txtnewlist_place"
             android:layout_alignBottom="@+id/newlist_place"
             android:layout_toRightOf="@+id/newlist_place"
-            android:layout_alignParentRight="true"/>
+            android:layout_alignParentRight="true"
+            android:hint="Lloc de la llista"/>
 
     <Button
             android:layout_width="100dp"

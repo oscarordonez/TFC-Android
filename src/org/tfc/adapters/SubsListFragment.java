@@ -167,13 +167,13 @@ public class SubsListFragment extends Fragment{
                 try {
                     JSONObject aux = llista.getJSONObject(i);
                     String txtidlist = null;
-                    txtidlist = aux.getString("id_llista");
+                    txtidlist = aux.getString("id");
                     String txtlistname = null;
-                    txtlistname = aux.getString("nom_llista");
-                    String txtlistdate = null;
-                    txtlistdate = "Test data";
+                    txtlistname = aux.getString("nom");
+                    String txtlistplace = null;
+                    txtlistplace = aux.getString("lloc");
 
-                    Llista llista_aux = new Llista(txtidlist,txtlistname,txtlistdate);
+                    Llista llista_aux = new Llista(txtidlist,txtlistname,txtlistplace);
                     llistes.add(llista_aux);
                 } catch (JSONException e) {
                     e.printStackTrace();

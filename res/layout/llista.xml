@@ -17,7 +17,7 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:text="SubText"
-            android:id="@+id/txt_listdate"
+            android:id="@+id/txt_listplace"
             style="@android:style/TextAppearance.DeviceDefault.Small"
             android:layout_alignLeft="@+id/txt_listname"
             android:layout_below="@+id/txt_listname"/>

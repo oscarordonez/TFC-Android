@@ -24,7 +24,7 @@ public class LlistaAdapter extends ArrayAdapter<Llista> {
 
     private class ViewHolder {
         TextView txtNom;
-        TextView txtData;
+        TextView txtLloc;
     }
 
     public View getView(int position, View convertView, ViewGroup parent) {
@@ -37,13 +37,13 @@ public class LlistaAdapter extends ArrayAdapter<Llista> {
             convertView = mInflater.inflate(R.layout.llista, null);
             holder = new ViewHolder();
             holder.txtNom = (TextView) convertView.findViewById(R.id.txt_listname);
-            holder.txtData= (TextView) convertView.findViewById(R.id.txt_listdate);
+            holder.txtLloc= (TextView) convertView.findViewById(R.id.txt_listplace);
             convertView.setTag(holder);
         } else
             holder = (ViewHolder) convertView.getTag();
 
         holder.txtNom.setText(llista.getNom_llista());
-        holder.txtData.setText("Dia: " + llista.getDia_llista());
+        holder.txtLloc.setText("Lloc: " + llista.getLloc_llista());
 
         return convertView;
     }
