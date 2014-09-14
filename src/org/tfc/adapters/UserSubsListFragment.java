@@ -192,7 +192,7 @@ public class UserSubsListFragment extends Fragment {
                     String txtuser = null;
                     txtuser = aux.getString("username");
                     String txtfirstname = null;
-                    txtfirstname = aux.getString("firstname");
+                    txtfirstname = "Nom: " + aux.getString("firstname");
                     String txtemail = null;
                     txtemail = aux.getString("email");
                     //txtemail = "";

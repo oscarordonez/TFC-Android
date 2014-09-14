@@ -45,7 +45,7 @@ public class UserAdapter extends ArrayAdapter<User> {
             holder = (ViewHolder) convertView.getTag();
 
         holder.txtUser.setText(user.getUser());
-        holder.txtName.setText("Nom: " + user.getFirstName());
+        holder.txtName.setText(user.getFirstName());
         holder.txtACSId.setText("Id usuari: " + user.getACS_id());
 
         return convertView;

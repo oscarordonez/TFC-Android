@@ -202,12 +202,20 @@ public class EventUserListFragment extends Fragment {
                     txtiduser = aux.getString("id_user");
                     String txtuser = null;
                     txtuser = aux.getString("username");
-                    String txtfirstname = null;
-                    txtfirstname = aux.getString("firstname");
+                    // Changed txtfirstname --> txtConvocat
+                    //String txtfirstname = null;
+                    //txtfirstname = aux.getString("firstname");
+                    String txtconvocat = null;
+                    txtconvocat = aux.getString("convocat");
+                    if (txtconvocat.equals("true"))
+                        txtconvocat = "Convocat: Sí";
+                    else
+                        txtconvocat = "Convocat: No";
+
                     String txtemail = null;
                     txtemail = "";
                     //String StrACS_id, String StrUser, String StrFirstName, String StrEmail
-                    User user_aux = new User(txtidobj,txtiduser,txtuser,txtfirstname,txtemail);
+                    User user_aux = new User(txtidobj,txtiduser,txtuser,txtconvocat,txtemail);
                     users.add(user_aux);
                 } catch (JSONException e) {
                     e.printStackTrace();
