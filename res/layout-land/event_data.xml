@@ -16,33 +16,22 @@
     <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="New Text1"
+            android:text="Data: ..."
             android:id="@+id/txt_eventadate"
             style="@android:style/TextAppearance.DeviceDefault.Small"
-            android:layout_alignLeft="@+id/txt_eventname"
-            android:layout_below="@+id/txt_eventname"
-            android:layout_alignRight="@+id/txt_eventname"/>
-
-    <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Hora: ..."
-            android:id="@+id/txt_eventHour"
-            android:layout_toRightOf="@+id/txt_eventadate"
-            android:layout_alignBottom="@+id/txt_eventadate"
-            android:layout_alignTop="@+id/txt_eventadate"
-            android:layout_alignParentRight="true"
-            style="@android:style/TextAppearance.DeviceDefault.Small"/>
+            android:layout_toRightOf="@+id/txt_eventname"
+            android:layout_alignTop="@+id/txt_eventname"
+            android:layout_alignRight="@+id/txt_eventPlace"
+            android:layout_alignBottom="@+id/txt_eventname"/>
 
     <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Lloc: ..."
             android:id="@+id/txt_eventPlace"
-            android:layout_toRightOf="@+id/txt_eventname"
-            android:layout_alignTop="@+id/txt_eventname"
-            android:layout_alignBottom="@+id/txt_eventname"
-            android:layout_alignParentRight="true"
-            style="@android:style/TextAppearance.DeviceDefault.Small"/>
+            style="@android:style/TextAppearance.DeviceDefault.Small"
+            android:layout_alignLeft="@+id/txt_eventname"
+            android:layout_below="@+id/txt_eventname"
+            android:layout_alignParentRight="true"/>
 
 </RelativeLayout>

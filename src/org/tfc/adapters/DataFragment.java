@@ -27,6 +27,7 @@ import java.util.Map;
 
 public class DataFragment extends Fragment {
     private String event_id;
+    private String event_lloc;
     private JSONArray llista;
 
     public final static String APP_KEY = "iGXpZFRj2XCl9Aixrig80d0rrftOzRef";
@@ -50,6 +51,7 @@ public class DataFragment extends Fragment {
 
          Bundle bundle = getActivity().getIntent().getExtras();
          event_id = bundle.getString("Event");
+         event_lloc = bundle.getString("Lloc");
          llista = new JSONArray();
 
          if (checkConnection())
@@ -169,6 +171,7 @@ public class DataFragment extends Fragment {
              aux = new JSONObject();
              TextView tv_eventname;
              TextView tv_eventdate;
+             TextView tv_eventlocation;
 
              if (dia.isShowing())
              dia.dismiss();
@@ -191,16 +194,21 @@ public class DataFragment extends Fragment {
 
                 String txtEventDate = null;
                 try {
-                    txtEventDate = aux.getString("data");
+                    txtEventDate = "Data: " + aux.getString("data");
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
+
+                String txtEventLocation = "Lloc: " + event_lloc;
 
                 tv_eventname = (TextView)getView().findViewById(R.id.txt_eventname);
                 tv_eventname.setText(txtEventName);
 
                 tv_eventdate = (TextView)getView().findViewById(R.id.txt_eventadate);
                 tv_eventdate.setText(txtEventDate);
+
+                tv_eventlocation = (TextView)getView().findViewById(R.id.txt_eventPlace);
+                tv_eventlocation.setText(txtEventLocation);
 
              }
          }

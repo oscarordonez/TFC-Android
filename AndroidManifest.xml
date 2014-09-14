@@ -55,7 +55,7 @@
             </intent-filter>
             <meta-data
                     android:name="com.appcelerator.cloud.push.BroadcastReceiver.ArrivalActivity"
-                    android:value="org.tfc.patxangueitor.ArrivalActivity" />
+                    android:value="org.tfc.patxangueitor.signin" />
         </receiver>
 
 

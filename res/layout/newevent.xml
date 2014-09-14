@@ -40,15 +40,6 @@
             android:layout_alignParentRight="true"
             android:hint="Nom event"/>
 
-    <EditText
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/txtEventDate"
-            android:layout_alignBottom="@+id/textView1"
-            android:hint="Data event"
-            android:layout_toRightOf="@+id/textView1"
-            android:layout_alignParentRight="true"/>
-
     <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -74,5 +65,19 @@
             android:gravity="center"
             android:paddingLeft="5pt"
             android:paddingRight="5pt"/>
+
+    <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:id="@id/txtEventDate"
+            android:editable="false"
+            android:onClick="showDatePickerDialog"
+            android:clickable="true"
+            android:autoText="false"
+            android:hint="Escollir data"
+            android:gravity="bottom"
+            android:layout_toRightOf="@+id/textView"
+            android:layout_alignBottom="@+id/textView1"
+            android:layout_alignTop="@+id/textView1"/>
 
 </RelativeLayout>

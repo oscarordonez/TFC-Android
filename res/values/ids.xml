@@ -6,5 +6,7 @@
 <item name="txt_pass" type="id">txtPass</item>
 <item name="btnCancel" type="id">buttonCancel</item>
 <item name="btnOk" type="id">buttonOk</item>
-<item name="btnNewUser" type="id">button_NewUser</item><item name="textViewAdmin" type="id"/><item name="txtnewlist_day" type="id"/>
+<item name="btnNewUser" type="id">button_NewUser</item>
+<item name="textViewAdmin" type="id"/>
+<item name="txtnewlist_day" type="id"/><item name="txtEventDate" type="id"/>
 </resources>

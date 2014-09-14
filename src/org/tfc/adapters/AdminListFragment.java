@@ -35,6 +35,7 @@ public class AdminListFragment extends Fragment {
     private String user_id;
     private String llista_id;
     private String nom_llista;
+    private String lloc_llista;
     private int i;
     private JSONArray llista;
     private LlistaAdapter adapter;
@@ -216,11 +217,13 @@ public class AdminListFragment extends Fragment {
                     Llista aux = llistes.get(position);
                     llista_id = aux.getLlista_id();
                     nom_llista = aux.getNom_llista();
+                    lloc_llista = aux.getLloc_llista();
 
                     Intent myIntent = new Intent(getActivity().getApplicationContext(), adminlistuser.class);
                     Bundle b = new Bundle();
                     b.putString("Llista", llista_id);
                     b.putString("NomLlista", nom_llista);
+                    b.putString("LlocLlista", lloc_llista);
                     myIntent.putExtras(b);
                     startActivity(myIntent);
                 }

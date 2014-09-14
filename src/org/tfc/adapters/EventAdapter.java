@@ -46,7 +46,7 @@ public class EventAdapter extends ArrayAdapter<Event> {
 
         holder.tvEventName.setText(event.getEventName());
         holder.tvEventDate.setText("Data: " + event.getEventDate());
-        holder.tvLocation.setText("Lloc: ");
+        holder.tvLocation.setText("Lloc: " + event.getEventLocation());
 
         return convertView;
     }

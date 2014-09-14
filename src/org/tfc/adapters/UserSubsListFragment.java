@@ -146,7 +146,7 @@ public class UserSubsListFragment extends Fragment {
 
             Map<String, Object> data = new HashMap<String, Object>();
             data.put("where", "{\"id_llista\" : \"" + llista_id + "\"}");
-            data.put("order", "id_usuari");
+            data.put("order", "username");
 
             CCResponse response = null;
             try {
@@ -194,7 +194,8 @@ public class UserSubsListFragment extends Fragment {
                     String txtfirstname = null;
                     txtfirstname = aux.getString("firstname");
                     String txtemail = null;
-                    txtemail = "";
+                    txtemail = aux.getString("email");
+                    //txtemail = "";
                     //String StrACS_id, String StrUser, String StrFirstName, String StrEmail
                     User user_aux = new User(txtidobj,txtiduser,txtuser,txtfirstname,txtemail);
                     users.add(user_aux);

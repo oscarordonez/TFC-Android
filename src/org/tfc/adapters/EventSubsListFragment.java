@@ -33,6 +33,7 @@ import java.util.Map;
 public class EventSubsListFragment extends Fragment {
     private ListView lv;
     private String llista_id;
+    private String llista_lloc;
     private String event_id;
     private JSONArray llista;
     private EventAdapter adapter;
@@ -56,6 +57,7 @@ public class EventSubsListFragment extends Fragment {
 
         Bundle bundle = getActivity().getIntent().getExtras();
         llista_id = bundle.getString("Llista");
+        llista_lloc = bundle.getString("LlocLlista");
         llista = new JSONArray();
 
         if (checkConnection())
@@ -188,8 +190,9 @@ public class EventSubsListFragment extends Fragment {
                     txtEventName = aux.getString("id_event");
                     String txtEventDate = null;
                     txtEventDate = aux.getString("data");
-                    //String StrACS_idLlista, String StrEventName, String StrEventDate
-                    Event event_aux = new Event(txteventid,llista_id,txtEventName,txtEventDate);
+                    String txtEventLocation = null;
+                    txtEventLocation = llista_lloc;
+                    Event event_aux = new Event(txteventid,llista_id,txtEventName,txtEventDate,true,txtEventLocation);
                     events.add(event_aux);
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -216,6 +219,7 @@ public class EventSubsListFragment extends Fragment {
                     Bundle b = new Bundle();
                     b.putString("Llista", llista_id);
                     b.putString("Event", event_id);
+                    b.putString("Llista", llista_lloc);
                     intent_Event.putExtras(b);
                     startActivity(intent_Event);
                 }

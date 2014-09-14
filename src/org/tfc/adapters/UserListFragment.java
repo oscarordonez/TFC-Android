@@ -35,6 +35,7 @@ public class UserListFragment extends Fragment {
     private TextView tv_newuser;
     private String llista_id;
     private String nom_llista;
+    private String lloc_llista;
     private JSONArray llista;
     private UserAdapter adapter;
 
@@ -58,6 +59,7 @@ public class UserListFragment extends Fragment {
         Bundle bundle = getActivity().getIntent().getExtras();
         llista_id = bundle.getString("Llista");
         nom_llista = bundle.getString("NomLlista");
+        lloc_llista = bundle.getString("LlocLlista");
         llista = new JSONArray();
 
         tv_newuser = (TextView)getView().findViewById(R.id.id_NewList);
@@ -68,6 +70,7 @@ public class UserListFragment extends Fragment {
                 Bundle b = new Bundle();
                 b.putString("Llista", llista_id);
                 b.putString("NomLlista", nom_llista);
+                b.putString("LlocLlista", lloc_llista);
                 intent_NewUser.putExtras(b);
                 startActivity(intent_NewUser);
             }
@@ -158,7 +161,7 @@ public class UserListFragment extends Fragment {
 
             Map<String, Object> data = new HashMap<String, Object>();
             data.put("where", "{\"id_llista\" : \"" + llista_id + "\"}");
-            data.put("order", "id_usuari");
+            data.put("order", "username");
 
             CCResponse response = null;
             try {
@@ -206,7 +209,7 @@ public class UserListFragment extends Fragment {
                     String txtfirstname = null;
                     txtfirstname = aux.getString("firstname");
                     String txtemail = null;
-                    txtemail = "Test email";
+                    txtemail = aux.getString("email");
                     User user_aux = new User(txtidobj,txtiduser,txtuser,txtfirstname,txtemail);
                     users.add(user_aux);
                 } catch (JSONException e) {

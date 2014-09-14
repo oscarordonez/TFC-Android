@@ -26,6 +26,7 @@ public class act_newuser extends Activity {
     private ListView lv;
     private String llista_id;
     private String nom_llista;
+    private String lloc_llista;
     private JSONObject auxJSON;
     private int i;
     private JSONArray users;
@@ -55,6 +56,7 @@ public class act_newuser extends Activity {
         Bundle b = this.getIntent().getExtras();
         llista_id = b.getString("Llista");
         nom_llista = b.getString("NomLlista");
+        lloc_llista = b.getString("LlocLlista");
 
         if (checkConnection())
             loadData = true;
@@ -227,10 +229,10 @@ public class act_newuser extends Activity {
             e.printStackTrace();
         }
 
-        data.put("fields", "{\"id_llista\" : \"" + llista_id + "\", \"nom_llista\": \"" + nom_llista + "\", \"id_user\": \"" + txtuserid + "\", \"username\": \"" + txtusername + "\", \"firstname\": \"" + txtfirstname
-                + "\", \"email\": \"" + txtemail + "\"}");
-
-
+        //data.put("fields", "{\"id_llista\" : \"" + llista_id + "\", \"nom_llista\": \"" + nom_llista + "\", \"id_user\": \"" + txtuserid + "\", \"username\": \"" + txtusername + "\", \"firstname\": \"" + txtfirstname
+        //        + "\", \"email\": \"" + txtemail + "\"}");
+        data.put("fields", "{\"id_llista\" : \"" + llista_id + "\", \"nom_llista\": \"" + nom_llista + "\" , \"id_user\": \"" + txtuserid + "\" , \"titular_llista\": \"" + true + "\", \"lloc_llista\": \"" + lloc_llista
+                  + "\", \"username\": \"" + txtusername + "\", \"firstname\": \"" + txtfirstname + "\", \"email\": \"" + txtemail + "\"}");
         try {
             CCResponse response = sdk.sendRequest("objects/subscripcio_usuari/create.json", CCRequestMethod.POST, data);
             CCMeta meta = response.getMeta();

@@ -29,6 +29,7 @@ public class SubsListFragment extends Fragment{
     private ListView lv;
     private String user_id;
     private String llista_id;
+    private String lloc_llista;
     private int i;
     private JSONArray llista;
     private LlistaAdapter adapter;
@@ -167,11 +168,11 @@ public class SubsListFragment extends Fragment{
                 try {
                     JSONObject aux = llista.getJSONObject(i);
                     String txtidlist = null;
-                    txtidlist = aux.getString("id");
+                    txtidlist = aux.getString("id_llista");
                     String txtlistname = null;
-                    txtlistname = aux.getString("nom");
+                    txtlistname = aux.getString("nom_llista");
                     String txtlistplace = null;
-                    txtlistplace = aux.getString("lloc");
+                    txtlistplace = aux.getString("lloc_llista");
 
                     Llista llista_aux = new Llista(txtidlist,txtlistname,txtlistplace);
                     llistes.add(llista_aux);
@@ -190,10 +191,13 @@ public class SubsListFragment extends Fragment{
                                         int position, long id) {
                     Llista aux = llistes.get(position);
                     llista_id = aux.getLlista_id();
+                    lloc_llista = aux.getLloc_llista();
+
 
                     Intent myIntent = new Intent(getActivity().getApplicationContext(), subslistuser.class);
                     Bundle b = new Bundle();
                     b.putString("Llista", llista_id);
+                    b.putString("LlocLlista", lloc_llista);
                     myIntent.putExtras(b);
                     startActivity(myIntent);
                 }

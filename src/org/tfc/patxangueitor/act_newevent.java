@@ -10,23 +10,31 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.app.DialogFragment;
+import android.support.v4.app.FragmentActivity;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 import com.appcelerator.cloud.sdk.*;
+import org.tfc.fragments.DatePickerFragment;
 
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-public class act_newevent extends Activity {
+public class act_newevent extends FragmentActivity {
     private String llista_id;
+    String eventName;
+    String eventDate;
+    TextView et_Date;
 
     public final static String APP_KEY = "iGXpZFRj2XCl9Aixrig80d0rrftOzRef";
     public final static String NOT_CONNECTED_TEXT = "No hi ha connexió de dades. No es pot realitzar l'operació";
     public final static String PROCESSING_TEXT = "Creant event. Esperi si us plau.";
     public final static String EVENT_CREATED_TEXT = "S'ha creat un nou event";
     public final static String EVENT_NOT_CREATED_TEXT = "No s'ha pogut crear la llista. Torna-ho a provar, si us plau";
+    public final static String FILL_FIELDS_TEXT = "És necessari omplir tots els camps";
 
     public static boolean loadData = true;
     private NetworkReceiver receiver = new NetworkReceiver();
@@ -45,6 +53,7 @@ public class act_newevent extends Activity {
 
         View createeventbtn = findViewById(R.id.btn_newevent);
         View canceleventbtn = findViewById(R.id.btn_cancelevent);
+        et_Date = (TextView) findViewById(R.id.txtEventDate);
 
         canceleventbtn.setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {
@@ -53,14 +62,22 @@ public class act_newevent extends Activity {
 
         createeventbtn.setOnClickListener(new View.OnClickListener(){
             public void onClick(View view){
+                eventName = ((EditText) findViewById(R.id.txtEventName)).getText().toString();
+                //eventDate = ((EditText) findViewById(R.id.txtEventDate)).getText().toString();
+                eventDate = ((TextView) findViewById(R.id.txtEventDate)).getText().toString();
+
                 if (checkConnection())
                     loadData = true;
                 else
                     loadData = false;
 
                 if (loadData){
-                    NewEventTask eventCreate= new NewEventTask();
-                    eventCreate.execute();
+                    if (checkFields()){
+                        NewEventTask eventCreate= new NewEventTask();
+                        eventCreate.execute();
+                    }
+                    else
+                        Toast.makeText(getApplicationContext(),FILL_FIELDS_TEXT, Toast.LENGTH_SHORT).show();
                 }
                 else
                     Toast.makeText(getApplicationContext(),NOT_CONNECTED_TEXT, Toast.LENGTH_SHORT).show();
@@ -139,11 +156,9 @@ public class act_newevent extends Activity {
 
         Map<String, Object> data = new HashMap<String, Object>();
 
-        String eventName = ((EditText) findViewById(R.id.txtEventName)).getText().toString();
-        String eventDate = ((EditText) findViewById(R.id.txtEventDate)).getText().toString();
-
-        data.put("fields", "{\"nom\" : \"" + eventName + "\", \"lloc\": \"" + eventDate + "\"}");
-        data.put("fields", "{\"id_llista\" : \"" + llista_id + "\", \"id_event\": \"" + eventName + "\", \"data\": \"" + eventDate + "\"}");
+        //data.put("fields", "{\"nom\" : \"" + eventName + "\", \"lloc\": \"" + eventDate + "\"}");
+        //data.put("fields", "{\"id_llista\" : \"" + llista_id + "\", \"id_event\": \"" + eventName + "\", \"data\": \"" + eventDate + "\"}");
+        data.put("fields", "{\"id_llista\" : \"" + llista_id + "\", \"id_event\": \"" + eventName + "\", \"data\": \"" + eventDate + "\" , \"actiu\": \"" + true + "\"}");
 
         try {
             CCResponse response = sdk.sendRequest("objects/event/create.json", CCRequestMethod.POST, data);
@@ -159,5 +174,17 @@ public class act_newevent extends Activity {
             e.printStackTrace();
         }
         return booStatus;
+    }
+
+    public void showDatePickerDialog(View v) {
+        DialogFragment newFragment = new DatePickerFragment(et_Date);
+        newFragment.show(getSupportFragmentManager(),"datePicker");
+    }
+
+    private Boolean checkFields(){
+        if (eventName.equals("") || eventDate.equals(""))
+            return false;
+        else
+            return true;
     }
 }

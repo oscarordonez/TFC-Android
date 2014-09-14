@@ -243,7 +243,7 @@ public class act_neweventuser extends Activity {
         }
 
         data.put("fields", "{\"id_llista\" : \"" + llista_id + "\" , \"id_event\": \"" + event_id + "\", \"id_user\": \"" + txtuserid + "\", \"username\": \"" + txtusername + "\", \"firstname\": \"" + txtfirstname
-                + "\", \"email\": \"" + txtemail + "\"}");
+                + "\", \"email\": \"" + txtemail + "\" , \"titular\": \"" + false + "\", \"convocat\": \"" + false + "\"}");
 
         try {
             CCResponse response = sdk.sendRequest("objects/subscripcio_event/create.json", CCRequestMethod.POST, data);
